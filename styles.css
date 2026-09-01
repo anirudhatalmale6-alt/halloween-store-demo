@@ -413,6 +413,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   .grid{grid-template-columns:repeat(2,1fr);gap:12px}
   .cats{gap:12px}
   .cat img{width:88px;height:88px}
+  /* two-up cards are too narrow for both chips on one line - drop the
+     discount to the bottom corner so a long badge can't collide with it */
+  .card__off{top:auto;bottom:12px}
+  .badge{font-size:.56rem;letter-spacing:1px;padding:.26rem .45rem;max-width:calc(100% - 24px)}
   .card__body{padding:.85rem .8rem 1rem}
   .card__name{font-size:.88rem}
   .card__blurb{display:none}
