@@ -229,6 +229,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   -webkit-background-clip:text;background-clip:text;color:transparent}
 .card__rcount{font-size:.74rem;color:var(--muted)}
 .card__name{font-size:1rem;font-weight:600;line-height:1.35;letter-spacing:.2px}
+/* the image and title link through to the product's own landing page */
+.card__name a{color:inherit;text-decoration:none}
+.card__name a:hover{color:var(--orange2)}
+.card__media{cursor:pointer}
 .card__blurb{font-size:.85rem;color:var(--muted);margin-top:.45rem;flex:1;line-height:1.55}
 .card__foot{margin-top:1.1rem;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .card__price{display:flex;align-items:baseline;gap:.5rem}
@@ -240,6 +244,137 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 }
 .btn--add:hover{background:var(--orange);color:#1a0c02;border-color:var(--orange)}
 .btn--add.done{background:var(--green);border-color:var(--green);color:#07230b}
+
+/* =========================================================
+   Product landing page
+   One of these per product, each on its own URL. Built for cold
+   ad traffic: price, proof and a buy button above the fold.
+   ========================================================= */
+.pdp{padding:calc(var(--hdr-h) + 56px) 0 clamp(48px,6vw,80px);position:relative}
+.pdp__in{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,64px);align-items:start}
+
+/* gallery */
+.pdp__gal{position:sticky;top:calc(var(--hdr-h) + 24px)}
+.pdp__stage{
+  position:relative;border-radius:var(--radius);overflow:hidden;
+  background:radial-gradient(circle at 50% 45%,#241a33,#120d1b);
+  border:1px solid var(--line2);padding:20px;aspect-ratio:1/1;display:grid;place-items:center;
+}
+.pdp__stage img{width:100%;height:100%;object-fit:contain}
+.pdp__off{
+  position:absolute;top:16px;right:16px;z-index:2;
+  background:rgba(123,255,106,.14);border:1px solid rgba(123,255,106,.5);color:var(--green);
+  font-size:.8rem;font-weight:700;letter-spacing:.6px;padding:.35rem .65rem;border-radius:8px;
+}
+.pdp__thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.pdp__thumb{
+  background:radial-gradient(circle at 50% 45%,#241a33,#120d1b);
+  border:1px solid var(--line2);border-radius:12px;padding:8px;cursor:pointer;
+  aspect-ratio:1/1;transition:border-color .2s ease,transform .2s ease;
+}
+.pdp__thumb img{width:100%;height:100%;object-fit:contain}
+.pdp__thumb:hover{transform:translateY(-2px)}
+.pdp__thumb.on{border-color:var(--orange)}
+
+/* buy box */
+.pdp__crumb{font-size:.74rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.pdp__crumb a{color:var(--orange2)}
+.pdp__crumb span{margin:0 .4rem;opacity:.5}
+.pdp__h{
+  font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;line-height:1.05;
+  font-size:clamp(1.9rem,3.4vw,2.9rem);letter-spacing:.5px;margin-top:.7rem;
+}
+.pdp__rate{display:flex;align-items:center;gap:.6rem;margin-top:.9rem}
+/* target the count by class, not by element. `.pdp__rate span` also matched the
+   star spans and, being one specificity point heavier than .star--on, silently
+   repainted a 4.8 rating in muted grey */
+.pdp__rc{font-size:.82rem;color:var(--muted)}
+.pdp__hook{font-size:1.06rem;line-height:1.6;color:var(--bone);font-weight:300;margin-top:1.1rem}
+.pdp__price{display:flex;align-items:baseline;gap:.8rem;flex-wrap:wrap;margin-top:1.5rem}
+.pdp__price .price{font-size:2.4rem}
+.pdp__price .was{font-size:1.05rem}
+.pdp__save{
+  background:rgba(123,255,106,.12);border:1px solid rgba(123,255,106,.4);color:var(--green);
+  font-size:.74rem;font-weight:700;letter-spacing:.8px;padding:.3rem .6rem;border-radius:6px;
+}
+.pdp__bul{list-style:none;margin:1.5rem 0 0}
+.pdp__bul li{position:relative;padding:.42rem 0 .42rem 1.7rem;font-size:.95rem;
+  font-weight:300;color:var(--bone);line-height:1.55}
+.pdp__bul li::before{
+  content:'';position:absolute;left:0;top:.95rem;width:11px;height:6px;
+  border-left:2.5px solid var(--orange);border-bottom:2.5px solid var(--orange);
+  transform:rotate(-45deg);
+}
+.pdp__stock{margin-top:1.6rem}
+.pdp__bar{height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.pdp__bar i{display:block;height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--orange),var(--orange2))}
+.pdp__stock p{font-size:.78rem;color:var(--orange2);margin-top:.5rem;letter-spacing:.4px}
+.pdp__act{display:flex;gap:12px;margin-top:1.5rem;align-items:stretch}
+.qty{
+  display:flex;align-items:center;gap:.2rem;flex:0 0 auto;
+  border:1px solid var(--line);border-radius:999px;background:var(--panel);padding:.25rem;
+}
+.qty button{
+  width:38px;height:38px;border-radius:50%;background:transparent;border:0;cursor:pointer;
+  color:var(--orange2);font-size:1.1rem;line-height:1;transition:background .2s ease;
+}
+.qty button:hover{background:rgba(255,117,24,.14)}
+.qty b{min-width:26px;text-align:center;font-size:1rem}
+/* the buy button is the gold one here, not the outline used in the grid */
+.pdp__act .btn--add{
+  background:linear-gradient(135deg,var(--orange),var(--orange2));color:#1a0c02;
+  border:0;font-size:.82rem;padding:.9rem 1.4rem;
+}
+.pdp__trust{list-style:none;margin-top:1.7rem;display:grid;gap:.55rem;
+  padding-top:1.5rem;border-top:1px solid var(--line2)}
+.pdp__trust li{position:relative;padding-left:1.6rem;font-size:.85rem;color:var(--muted)}
+.pdp__trust li::before{
+  content:'';position:absolute;left:0;top:.5rem;width:10px;height:6px;
+  border-left:2px solid var(--green);border-bottom:2px solid var(--green);transform:rotate(-45deg);
+}
+
+/* features */
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:2.8rem}
+.feat{background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius);
+  padding:1.8rem 1.6rem}
+.feat h3{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;
+  font-size:1.08rem;letter-spacing:.7px;color:var(--orange2)}
+.feat p{font-size:.93rem;line-height:1.65;color:var(--muted);margin-top:.8rem;font-weight:300}
+
+/* specs + what's in the box */
+.spec{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,4vw,60px);align-items:start}
+.spec .sec__h{text-align:left;font-size:clamp(1.5rem,2.4vw,2rem)}
+.spec table{width:100%;border-collapse:collapse;margin-top:1.6rem}
+.spec th,.spec td{text-align:left;padding:.85rem 0;border-bottom:1px solid var(--line2);
+  font-size:.92rem;vertical-align:top}
+.spec th{color:var(--muted);font-weight:500;width:42%;padding-right:1rem}
+.spec td{color:var(--bone);font-weight:300}
+.spec__box .ticks{margin-top:1.6rem}
+/* height:auto is load-bearing. The img carries width="600" height="600"
+   attributes for layout stability; without it the attribute height survives
+   and the picture renders 280x600 - stretched, and tall enough to inflate the
+   whole section to 897px against a 373px table */
+.spec__art{width:100%;max-width:250px;height:auto;margin-top:.5rem;
+  filter:drop-shadow(0 20px 44px rgba(255,117,24,.14))}
+
+/* sticky buy bar - mobile ad traffic scrolls, and the button has to follow */
+.stick{
+  position:fixed;left:0;right:0;bottom:0;z-index:70;display:none;align-items:center;gap:12px;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(15,10,22,.97);border-top:1px solid var(--line);
+  transform:translateY(100%);transition:transform .28s ease;
+}
+.stick.on{transform:translateY(0)}
+.stick img{width:44px;height:44px;object-fit:contain;flex:0 0 auto;
+  background:#1a1226;border-radius:10px;padding:4px}
+.stick__m{flex:1;min-width:0}
+.stick__m p{font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stick__m span{font-size:.8rem;color:var(--muted)}
+.stick__m b{color:var(--bone);font-size:.95rem}
+.stick__m s{margin-left:.3rem;opacity:.65}
+.stick .btn--add{flex:0 0 auto;background:linear-gradient(135deg,var(--orange),var(--orange2));
+  color:#1a0c02;border:0;padding:.7rem 1.3rem}
 
 /* ---------- why ---------- */
 .why{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
@@ -253,7 +388,8 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   transform:rotate(-45deg);
 }
 .why__art{display:grid;place-items:center}
-.why__art img{width:100%;max-width:400px;filter:drop-shadow(0 24px 50px rgba(123,255,106,.16))}
+.why__art img{width:100%;max-width:400px;height:auto;
+  filter:drop-shadow(0 24px 50px rgba(123,255,106,.16))}
 
 /* ---------- reviews ---------- */
 .revs{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:2.8rem}
@@ -406,6 +542,13 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   .nav a:last-child{border-bottom:0}
   .trust__in{grid-template-columns:repeat(2,1fr);gap:14px}
   .revs{grid-template-columns:1fr}
+  /* one column: the gallery must stop being sticky or it pins to the top and
+     the buy box scrolls away underneath it */
+  .pdp__in{grid-template-columns:1fr;gap:28px}
+  .pdp__gal{position:static}
+  .feats{grid-template-columns:1fr}
+  .spec{grid-template-columns:1fr;gap:34px}
+  .stick{display:flex}
 }
 
 @media(max-width:640px){
@@ -428,6 +571,17 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   .ann p{font-size:.66rem;letter-spacing:1px}
   .ftr__in{grid-template-columns:1fr 1fr}
   .ftr__base{justify-content:center;text-align:center}
+  .pdp{padding-top:calc(var(--hdr-h) + 28px)}
+  .pdp__price .price{font-size:1.9rem}
+  /* the grid's .btn--add goes full width at this size; the buy box has a
+     quantity stepper beside it, so it must not */
+  .pdp__act .btn--add{width:auto;flex:1}
+  .stick .btn--add{width:auto}
+  .spec__art{display:none}
+  .stick{padding-left:12px;padding-right:12px}
+  /* the sticky bar sits over the footer at the bottom of the page - give the
+     landing pages room underneath so nothing is permanently covered */
+  .pdp-page{padding-bottom:74px}
 }
 
 @media(prefers-reduced-motion:reduce){

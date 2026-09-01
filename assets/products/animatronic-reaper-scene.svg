@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Animatronic reaper in use">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="#191233"/>
+<stop offset="100%" stop-color="#0b0810"/>
+</linearGradient>
+<radialGradient id="moon" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#fff6d8" stop-opacity=".5"/>
+<stop offset="100%" stop-color="#fff6d8" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="g" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#a06bff" stop-opacity=".5"/>
+<stop offset="100%" stop-color="#a06bff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="back" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#a06bff" stop-opacity=".3"/>
+<stop offset="55%" stop-color="#a06bff" stop-opacity=".12"/>
+<stop offset="100%" stop-color="#a06bff" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="600" height="600" fill="url(#sky)"/>
+<circle cx="472" cy="118" r="120" fill="url(#moon)"/>
+<circle cx="472" cy="118" r="44" fill="#f6eecd"/>
+<circle cx="458" cy="104" r="9" fill="#e4d9b0"/>
+<circle cx="488" cy="132" r="6" fill="#e4d9b0"/>
+<g fill="#f4efe6" opacity=".55">
+<circle cx="86" cy="86" r="2.6"/><circle cx="168" cy="52" r="2"/><circle cx="252" cy="106" r="2.4"/>
+<circle cx="54" cy="182" r="2"/><circle cx="340" cy="64" r="2.2"/><circle cx="562" cy="228" r="2"/>
+</g>
+<path d="M0 214 62 214 62 150 108 118 154 150 154 214 236 214 236 260 0 260Z" fill="#0a0713"/>
+<g stroke="#0a0713" stroke-width="13" stroke-linecap="round">
+<path d="M-4 344v112M40 330v126M84 344v112M128 330v126"/>
+<path d="M472 330v126M516 344v112M560 330v126M604 344v112"/>
+</g>
+<path d="M-10 386h180M-10 424h180M430 386h180M430 424h180" stroke="#0a0713" stroke-width="11"/>
+<!-- a soft light behind the subject, in the product's own glow colour. Several
+     pieces are drawn as dark silhouettes (the spider's legs, the reaper's arms)
+     and vanish against a night sky with nothing behind them. It has to be a
+     gradient - a flat ellipse at low opacity renders as a visible grey disc -->
+<ellipse cx="300" cy="336" rx="270" ry="248" fill="url(#back)"/>
+<ellipse cx="300" cy="512" rx="215" ry="46" fill="url(#g)"/>
+<g transform="translate(300 356) scale(.74) translate(-300 -300)">
+
+<path d="M470 92 404 500" stroke="#6b5540" stroke-width="15" stroke-linecap="round"/>
+<path d="M470 92c60 8 98 46 106 100-56-44-96-52-124-38z" fill="#f4efe6"/>
+<path d="M196 268 118 350M404 268l78 82" stroke="#241a33" stroke-width="34" stroke-linecap="round"/>
+<path d="M300 96c-66 0-108 44-108 106 0 26 6 44 6 62l-48 236 32-38 28 38 28-38 28 38 28-38 28 38 28-38 32 38-48-236c0-18 6-36 6-62 0-62-42-106-108-106z"
+      fill="#241a33" stroke="#a06bff" stroke-width="7" stroke-linejoin="round"/>
+<ellipse cx="300" cy="200" rx="66" ry="76" fill="#05040a"/>
+<path d="M300 150c-31 0-51 22-51 53 0 18 8 31 18 39v20c0 8 6 13 14 13h38c8 0 14-5 14-13v-20c10-8 18-21 18-39 0-31-20-53-51-53z" fill="#f4efe6"/>
+<ellipse cx="282" cy="201" rx="13" ry="15" fill="#7bff6a"/>
+<ellipse cx="318" cy="201" rx="13" ry="15" fill="#7bff6a"/>
+<path d="M300 216l-8 15h16z" fill="#05040a"/>
+<g stroke="#05040a" stroke-width="3.5"><path d="M288 244v14M300 244v14M312 244v14"/></g>
+
+</g>
+<path d="M0 508h600v92H0z" fill="#08060e"/>
+<path d="M0 508q150-18 300 0t300-14v14H0z" fill="#0d0a18"/>
+<g fill="#08060e">
+<path d="M92 508q10-30 22-30t20 30z"/><path d="M486 508q9-26 19-26t18 26z"/>
+</g>
+</svg>

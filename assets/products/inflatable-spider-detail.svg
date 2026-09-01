@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="8ft inflatable spider detail">
+<defs>
+<radialGradient id="g" cx="50%" cy="42%" r="58%">
+<stop offset="0%" stop-color="#8b5cf6" stop-opacity=".6"/>
+<stop offset="60%" stop-color="#8b5cf6" stop-opacity=".16"/>
+<stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<circle cx="300" cy="260" r="290" fill="url(#g)"/>
+<!-- 1.34, not 1.6. A harder zoom cropped the legs off the spider and the head
+     off the dog, and a close-up you cannot identify is worse than no close-up -->
+<g transform="translate(300 262) scale(1.34) translate(-300 -280)">
+
+<g stroke="#1b1425" stroke-width="20" fill="none" stroke-linecap="round">
+<path d="M228 300 116 216 68 300M228 336 96 348 70 420M372 300l112-84 48 84M372 336l132 12 26 72"/>
+<path d="M252 258 178 150l-70 26M348 258l74-108 70 26"/>
+</g>
+<ellipse cx="300" cy="352" rx="118" ry="98" fill="#241a36" stroke="#8b5cf6" stroke-width="8"/>
+<ellipse cx="300" cy="242" rx="76" ry="64" fill="#2f2247" stroke="#8b5cf6" stroke-width="8"/>
+<circle cx="272" cy="230" r="17" fill="#ff7518"/>
+<circle cx="328" cy="230" r="17" fill="#ff7518"/>
+<circle cx="250" cy="262" r="10" fill="#ff7518"/>
+<circle cx="350" cy="262" r="10" fill="#ff7518"/>
+
+</g>
+</svg>

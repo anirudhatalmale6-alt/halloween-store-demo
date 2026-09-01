@@ -49,9 +49,19 @@ HAND = ("""<ellipse cy="8" rx="46" ry="52"/>"""
         """<rect x="-10" y="-98" width="20" height="56" rx="10" transform="rotate(-64)"/>""")
 
 
-def art(slug, glow, body):
-    """Wrap a piece of artwork in the shared 600x600 stage + radial glow."""
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="{slug}">
+def art(label, glow, body):
+    """Hold a piece of artwork as data so it can be re-staged three ways.
+
+    Returns the raw parts rather than finished SVG - the product landing pages
+    need a gallery, and a gallery of the same picture three times is a lie. The
+    renderers below put the SAME body on three different stages instead.
+    """
+    return (label, glow, body)
+
+
+def render_main(label, glow, body):
+    """The catalogue shot: subject centred on a soft radial glow."""
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="{label}">
 <defs>
 <radialGradient id="g" cx="50%" cy="46%" r="52%">
 <stop offset="0%" stop-color="{glow}" stop-opacity=".55"/>
@@ -64,6 +74,87 @@ def art(slug, glow, body):
 {body}
 </svg>
 """
+
+
+def render_detail(label, glow, body):
+    """The close-up: same subject scaled about the centre, so the viewBox crops
+    it. Genuinely a different view - you can read detail here that the catalogue
+    shot is too small to show."""
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="{label} detail">
+<defs>
+<radialGradient id="g" cx="50%" cy="42%" r="58%">
+<stop offset="0%" stop-color="{glow}" stop-opacity=".6"/>
+<stop offset="60%" stop-color="{glow}" stop-opacity=".16"/>
+<stop offset="100%" stop-color="{glow}" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<circle cx="300" cy="260" r="290" fill="url(#g)"/>
+<!-- 1.34, not 1.6. A harder zoom cropped the legs off the spider and the head
+     off the dog, and a close-up you cannot identify is worse than no close-up -->
+<g transform="translate(300 262) scale(1.34) translate(-300 -280)">
+{body}
+</g>
+</svg>
+"""
+
+
+def render_scene(label, glow, body):
+    """The in-situ shot: same subject on a night porch - moon, fence, ground.
+    Scaled down and lifted so the fence reads as behind it."""
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="{label} in use">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="#191233"/>
+<stop offset="100%" stop-color="#0b0810"/>
+</linearGradient>
+<radialGradient id="moon" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#fff6d8" stop-opacity=".5"/>
+<stop offset="100%" stop-color="#fff6d8" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="g" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="{glow}" stop-opacity=".5"/>
+<stop offset="100%" stop-color="{glow}" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="back" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="{glow}" stop-opacity=".3"/>
+<stop offset="55%" stop-color="{glow}" stop-opacity=".12"/>
+<stop offset="100%" stop-color="{glow}" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="600" height="600" fill="url(#sky)"/>
+<circle cx="472" cy="118" r="120" fill="url(#moon)"/>
+<circle cx="472" cy="118" r="44" fill="#f6eecd"/>
+<circle cx="458" cy="104" r="9" fill="#e4d9b0"/>
+<circle cx="488" cy="132" r="6" fill="#e4d9b0"/>
+<g fill="#f4efe6" opacity=".55">
+<circle cx="86" cy="86" r="2.6"/><circle cx="168" cy="52" r="2"/><circle cx="252" cy="106" r="2.4"/>
+<circle cx="54" cy="182" r="2"/><circle cx="340" cy="64" r="2.2"/><circle cx="562" cy="228" r="2"/>
+</g>
+<path d="M0 214 62 214 62 150 108 118 154 150 154 214 236 214 236 260 0 260Z" fill="#0a0713"/>
+<g stroke="#0a0713" stroke-width="13" stroke-linecap="round">
+<path d="M-4 344v112M40 330v126M84 344v112M128 330v126"/>
+<path d="M472 330v126M516 344v112M560 330v126M604 344v112"/>
+</g>
+<path d="M-10 386h180M-10 424h180M430 386h180M430 424h180" stroke="#0a0713" stroke-width="11"/>
+<!-- a soft light behind the subject, in the product's own glow colour. Several
+     pieces are drawn as dark silhouettes (the spider's legs, the reaper's arms)
+     and vanish against a night sky with nothing behind them. It has to be a
+     gradient - a flat ellipse at low opacity renders as a visible grey disc -->
+<ellipse cx="300" cy="336" rx="270" ry="248" fill="url(#back)"/>
+<ellipse cx="300" cy="512" rx="215" ry="46" fill="url(#g)"/>
+<g transform="translate(300 356) scale(.74) translate(-300 -300)">
+{body}
+</g>
+<path d="M0 508h600v92H0z" fill="#08060e"/>
+<path d="M0 508q150-18 300 0t300-14v14H0z" fill="#0d0a18"/>
+<g fill="#08060e">
+<path d="M92 508q10-30 22-30t20 30z"/><path d="M486 508q9-26 19-26t18 26z"/>
+</g>
+</svg>
+"""
+
+
+VIEWS = (("", render_main), ("-detail", render_detail), ("-scene", render_scene))
 
 
 ARTWORK = {
@@ -121,8 +212,10 @@ ARTWORK = {
 <circle cx="556" cy="282" r="11" fill="#2a1405"/>
 <circle cx="466" cy="264" r="11" fill="#2a1405"/>
 <g stroke="{BONE}" stroke-width="11" stroke-linecap="round" fill="none">
-<path d="M198 296v72M236 288v88M276 288v88M316 288v88M356 288v88M394 296v72"/>
-<path d="M188 332h216"/>
+<!-- ribs bow, they do not run straight down. Straight bars read as a picket
+     fence at any size above a thumbnail - the curve is what makes it a ribcage -->
+<path d="M206 292q-15 42 0 82M244 286q-16 45 0 88M282 284q-17 47 0 92M320 284q-17 47 0 92M358 286q-16 45 0 88M394 292q-15 42 0 82"/>
+<path d="M190 330q108-15 216 0"/>
 </g>
 """),
 
@@ -254,6 +347,107 @@ PRODUCTS = [
          blurb="Colour-changing mist bowl for the porch or the punch table. Just add water."),
 ]
 
+# --------------------------------------------------------------------------
+# Per-product landing page content.
+#
+# Everything here is optional. A product with no DETAILS entry still gets a
+# complete landing page from the fallbacks in detail_for() - which matters,
+# because when the real product list arrives I want name + price + photo to be
+# enough to ship a page, and the rest to be an upgrade rather than a blocker.
+# --------------------------------------------------------------------------
+
+DETAILS = {
+
+"animatronic-reaper": dict(
+    hook="Your porch, but people cross the street to avoid it.",
+    bullets=[
+        "5ft 8in tall - reads as a person from the sidewalk, which is the whole trick",
+        "Motion sensor triggers at up to 15ft, adjustable down to 3ft",
+        "Head turns, arms raise, eyes glow red, and it screams",
+        "Three volume levels including silent, for the neighbours you like",
+    ],
+    features=[
+        ("It moves before they see it", "The sensor fires while they're still on the path, so the turn happens in their peripheral vision. That's what makes people jump - not the noise."),
+        ("Weatherproof where it counts", "Sealed motor housing and a covered battery bay. It sits out through rain and a Philadelphia October without complaint."),
+        ("Up in four minutes", "Two-piece pole into a weighted base, drape the robe, drop in 4 D-cells. No tools, no stakes, no assembly instructions you'll need to squint at."),
+    ],
+    specs=[("Height", "5ft 8in (173cm)"), ("Power", "4 x D battery or 5V adapter (both included)"),
+           ("Trigger", "PIR motion, 3-15ft adjustable"), ("Sound", "3 levels + silent, 88dB max"),
+           ("Material", "Polyester robe, ABS frame, latex skull"), ("Weather", "IPX4 - rain safe, not submersible")],
+    box=["Animatronic reaper", "Weighted base + 2-piece pole", "5V power adapter", "Scythe prop", "Quick-start card"],
+    reviews=[("Marisa T.", "Philadelphia, PA", 5, "Ordered Tuesday, had it Friday. My street has a group chat and it is entirely about my front yard now."),
+             ("Ken A.", "Toledo, OH", 5, "Set the sensor to 15ft and it catches people at the mailbox. Worth it for the video I got of my brother-in-law alone."),
+             ("Dana W.", "Sacramento, CA", 4, "Genuinely scary and easy to set up. Knocked one star because the scythe is lighter than it looks in photos.")],
+),
+
+"fog-machine": dict(
+    hook="One minute to a driveway nobody can see the end of.",
+    bullets=[
+        "1000W - fills a two-car driveway in under 60 seconds",
+        "12 colour LEDs wash the fog from underneath",
+        "Wireless remote plus a wired timer controller, both included",
+        "1 litre tank runs roughly 45 minutes of intermittent bursts",
+    ],
+    features=[
+        ("Low-lying fog, not a cloud", "The output is cooled on the way out so it hugs the ground instead of drifting up and vanishing. That's the look people are actually buying."),
+        ("Two ways to control it", "Wireless remote for manual bursts on the night, or the wired timer to set interval, duration and intensity and then forget about it."),
+        ("Water-based and non-staining", "Standard fog fluid, safe around kids and pets, leaves no residue on a porch or a car. Do not use oil-based fluid in it."),
+    ],
+    specs=[("Power", "1000W, 110V"), ("Tank", "1 litre"), ("Warm-up", "3-4 minutes from cold"),
+           ("Output", "Approx 8,000 cu ft/min"), ("LEDs", "12 x RGB, remote selectable"),
+           ("Controls", "Wireless remote + wired timer")],
+    box=["Fog machine", "Wireless remote", "Wired timer remote", "Hanging bracket", "250ml starter fluid"],
+    reviews=[("Devon R.", "Austin, TX", 5, "Genuinely too powerful for my porch and I could not be happier about that."),
+             ("Lucia M.", "Queens, NY", 5, "The LEDs are the part I didn't expect to care about. Green fog through a fence is unreal."),
+             ("Tom B.", "Denver, CO", 4, "Great machine. Buy a gallon of fluid with it, the starter bottle goes fast.")],
+),
+
+"pet-costume": dict(
+    hook="The reason your dog ends up on somebody's story.",
+    bullets=[
+        "Glow-in-the-dark ribcage - charges under any light, glows for hours",
+        "Machine washable, XS to XXL, cats included",
+        "Steps in and velcros - no over-the-head struggle",
+        "Leaves legs and tail completely free",
+    ],
+    features=[
+        ("It actually glows", "Phosphorescent print, not a light-grey print that photographs as glowing. Ten minutes under a lamp gets you a full evening."),
+        ("Sized off real measurements", "The chart is chest girth and back length, not S/M/L guesswork. Measure your dog once and the fit is right first time."),
+        ("Survives the wash", "Cold cycle, hang dry, and the print stays put. It's meant to come back out next October, not go in the bin on November 1st."),
+    ],
+    specs=[("Sizes", "XS, S, M, L, XL, XXL"), ("Fit", "Chest 11in - 34in"), ("Material", "Polyester / spandex blend"),
+           ("Glow", "Phosphorescent, approx 4hr after 10min charge"), ("Closure", "Velcro belly panel"),
+           ("Care", "Machine wash cold, hang dry")],
+    box=["Skeleton pet costume", "Size + measuring guide"],
+    reviews=[("Priya K.", "Chicago, IL", 5, "Arrived in two days, fits my beagle perfectly, and the glow is real glow not a printed-on gimmick."),
+             ("Erin S.", "Portland, OR", 5, "Bought XS for a cat fully expecting a disaster. She wore it for an hour. I have never been more surprised."),
+             ("Marcus D.", "Atlanta, GA", 5, "Third Halloween on the same costume, washed every year, still glows.")],
+),
+
+"inflatable-spider": dict(
+    hook="Eight feet of yard that your neighbours have to look at.",
+    bullets=[
+        "8ft across, self-inflates in about 40 seconds",
+        "Lights from inside - visible from down the block",
+        "Stakes and tethers included, holds in real wind",
+        "Deflates and folds into a bag the size of a pillow",
+    ],
+    features=[
+        ("Big enough to read from the road", "Most yard inflatables are 4-5ft and disappear from the sidewalk. Eight feet is the size where drivers slow down."),
+        ("Tied down properly", "Four ground stakes and three guy-line tethers, not the two flimsy pegs these usually ship with. It stays where you put it."),
+        ("Packs away small", "Fan pulls out, air pushes out, folds into the included bag. Stores on a shelf, not in half your garage."),
+    ],
+    specs=[("Size", "8ft wide x 5ft tall inflated"), ("Power", "Mains adapter, 30ft outdoor cord"),
+           ("Lighting", "4 internal LEDs, always-on"), ("Inflate", "Approx 40 seconds"),
+           ("Material", "Polyester, weather-treated"), ("Anchors", "4 stakes + 3 tethers")],
+    box=["Inflatable spider", "Internal fan + adapter", "4 ground stakes", "3 tethers", "Storage bag", "Patch kit"],
+    reviews=[("Ray H.", "Cherry Hill, NJ", 5, "Went up in five minutes and survived a genuinely windy week. The tethers are the difference."),
+             ("Nadia P.", "Tampa, FL", 5, "Kids on the block have named it. That's the review."),
+             ("Stephen L.", "Boise, ID", 4, "Bright, big, easy. The cord is long but you'll still probably want an extension.")],
+),
+}
+
+
 CATEGORIES = [
     ("Animatronics", "The ones that move, scream and ruin trick-or-treaters", "animatronic-reaper"),
     ("Yard & Decor", "Inflatables, tombstones, fog and lighting", "inflatable-spider"),
@@ -312,18 +506,25 @@ def money(v):
     return f"${v:,.2f}"
 
 
-def product_card(p):
+def product_card(p, base="", href=None):
+    """A grid card. `href` is the product's landing page; `base` prefixes assets.
+
+    The image and the title are links, the Add button is not - a button nested
+    inside an anchor is both invalid and ambiguous to click.
+    """
     off = round((1 - p["price"] / p["was"]) * 100)
     badge = f'<span class="badge">{html.escape(p["badge"])}</span>' if p["badge"] else ""
+    href = href if href is not None else f"p/{p['slug']}/"
+    name = html.escape(p["name"])
     return f"""      <article class="card" data-slug="{p['slug']}">
-        <div class="card__media">
+        <a class="card__media" href="{href}">
           {badge}
           <span class="card__off">-{off}%</span>
-          <img src="assets/products/{p['slug']}.svg" alt="{html.escape(p['name'])}" loading="lazy" width="600" height="600" />
-        </div>
+          <img src="{base}assets/products/{p['slug']}.svg" alt="{name}" loading="lazy" width="600" height="600" />
+        </a>
         <div class="card__body">
           <div class="card__rating">{stars(p['rating'])}<span class="card__rcount">{p['rating']} ({p['reviews']:,})</span></div>
-          <h3 class="card__name">{html.escape(p['name'])}</h3>
+          <h3 class="card__name"><a href="{href}">{name}</a></h3>
           <p class="card__blurb">{html.escape(p['blurb'])}</p>
           <div class="card__foot">
             <div class="card__price"><span class="price">{money(p['price'])}</span><span class="was">{money(p['was'])}</span></div>
@@ -374,11 +575,312 @@ LOGO = """<svg class="logo__mark" viewBox="0 0 64 64" aria-hidden="true">
 </svg>"""
 
 
+# --------------------------------------------------------------------------
+# Shared chrome. The header, footer and cart drawer are generated once and
+# used by the homepage and all ten landing pages, so they cannot drift apart.
+# `base` prefixes asset paths, `home` prefixes in-page anchors.
+# --------------------------------------------------------------------------
+
+NAV = [("shop", "Shop All"), ("cats", "Categories"), ("why", "Why Us"),
+       ("reviews", "Reviews"), ("faq", "FAQ")]
+
+
+def announce_html():
+    return """<div class="ann">
+  <p>FREE US SHIPPING ON EVERYTHING &nbsp;&middot;&nbsp; Order by Oct 20 and it lands before Halloween &nbsp;&middot;&nbsp; <strong id="ann-count">&nbsp;</strong></p>
+</div>
+"""
+
+
+def header_html(base, home):
+    links = "".join(f'      <a href="{home}#{a}">{html.escape(t)}</a>\n' for a, t in NAV)
+    return f"""<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+    <a class="logo" href="{home or '#top'}">{LOGO}<span class="logo__txt">Hollow<em>&amp;</em>Hex</span></a>
+    <nav class="nav" id="nav">
+{links}    </nav>
+    <div class="hdr__act">
+      <button class="cartbtn" id="cartbtn" type="button" aria-label="Open cart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-1.6 9.2a2 2 0 0 1-2 1.8H9.3a2 2 0 0 1-2-1.7L5.4 3.7A1 1 0 0 0 4.4 3H2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/></svg>
+        <span class="cartbtn__n" id="cartn">0</span>
+      </button>
+      <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+"""
+
+
+def footer_html(base, home):
+    return f"""<footer class="ftr">
+  <div class="wrap ftr__in">
+    <div class="ftr__brand">
+      <a class="logo" href="{home or '#top'}">{LOGO}<span class="logo__txt">Hollow<em>&amp;</em>Hex</span></a>
+      <p>Animatronics, fog and yard decor, shipped free across the US and guaranteed before October 31st.</p>
+    </div>
+    <div class="ftr__col"><h4>Shop</h4><a href="{home}#shop">Best Sellers</a><a href="{home}#cats">Animatronics</a><a href="{home}#cats">Yard &amp; Decor</a><a href="{home}#cats">Costumes</a><a href="{home}#cats">Pet Costumes</a></div>
+    <div class="ftr__col"><h4>Help</h4><a href="{home}#faq">Shipping</a><a href="{home}#faq">Returns</a><a href="{home}#faq">Track My Order</a><a href="{home}#faq">Contact</a></div>
+    <div class="ftr__col"><h4>Company</h4><a href="{home}#why">About</a><a href="{home}#reviews">Reviews</a><a href="{home}#faq">Privacy</a><a href="{home}#faq">Terms</a></div>
+  </div>
+  <div class="wrap ftr__base">
+    <p>&copy; 2026 {BRAND}. Demo storefront built for review &mdash; not a live shop.</p>
+    <p class="ftr__pay"><span>VISA</span><span>MC</span><span>AMEX</span><span>PayPal</span><span>Shop&nbsp;Pay</span></p>
+  </div>
+</footer>
+"""
+
+
+def cart_html():
+    return """<div class="scrim" id="scrim" hidden></div>
+<aside class="cart" id="cart" aria-label="Shopping cart" aria-hidden="true">
+  <div class="cart__hd">
+    <h2>Your Cart</h2>
+    <button class="cart__x" id="cartx" type="button" aria-label="Close cart">&times;</button>
+  </div>
+  <div class="cart__body" id="cartbody"></div>
+  <div class="cart__ft">
+    <div class="cart__row"><span>Subtotal</span><b id="carttot">$0.00</b></div>
+    <div class="cart__row cart__row--ship"><span>Shipping</span><b>FREE</b></div>
+    <button class="btn btn--gold btn--wide" type="button" id="checkout">Checkout</button>
+    <p class="cart__note">Demo storefront &mdash; checkout is not connected to a payment provider.</p>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status"></div>
+"""
+
+
+# --------------------------------------------------------------------------
+# Product landing pages - one per product, its own URL, built to convert ad
+# traffic that lands on it cold.
+# --------------------------------------------------------------------------
+
+def detail_for(p):
+    """Landing page content for a product, with a full set of fallbacks.
+
+    A product that has no DETAILS entry still produces a complete page. This is
+    deliberate: when the real product list lands, name + price + photo has to be
+    enough to ship, with the written detail an upgrade rather than a blocker.
+    """
+    d = dict(DETAILS.get(p["slug"], {}))
+    d.setdefault("hook", p["blurb"])
+    d.setdefault("bullets", [s.strip() for s in p["blurb"].split(".") if s.strip()][:4] or
+                            ["Ships free anywhere in the US"])
+    d.setdefault("features", [
+        ("Ships free, ships fast", "Out of a US warehouse within 24 hours of your order, tracked the whole way. No six-week wait from overseas."),
+        ("Guaranteed before Halloween", "Order by October 20th and it is on your doorstep by the 30th, or you do not pay for it."),
+        ("30 days to change your mind", "Unopened returns for a full refund. Damaged in transit, send a photo and we reship the same day."),
+    ])
+    d.setdefault("specs", [("Ships from", "United States"), ("Shipping", "Free, 2-5 business days"),
+                           ("Returns", "30 days, unopened"), ("Stock", "In stock now")])
+    d.setdefault("box", [p["name"]])
+    d.setdefault("reviews", REVIEWS)
+    return d
+
+
+def landing_page(p, others):
+    d = detail_for(p)
+    off = round((1 - p["price"] / p["was"]) * 100)
+    save = p["was"] - p["price"]
+    base = "../../"
+    home = "../../index.html"
+    img = f"{base}assets/products/{p['slug']}"
+    esc = html.escape
+
+    thumbs = "".join(
+        f'''        <button class="pdp__thumb{' on' if i == 0 else ''}" type="button" data-view="{img}{suf}.svg" aria-label="View {i + 1}">
+          <img src="{img}{suf}.svg" alt="" width="600" height="600" loading="lazy" />
+        </button>
+'''
+        for i, (suf, _) in enumerate(VIEWS))
+
+    bullets = "".join(f"        <li>{esc(b)}</li>\n" for b in d["bullets"])
+
+    features = "".join(f"""      <article class="feat">
+        <h3>{esc(t)}</h3>
+        <p>{esc(x)}</p>
+      </article>
+""" for t, x in d["features"])
+
+    specs = "".join(f"          <tr><th scope=\"row\">{esc(k)}</th><td>{esc(v)}</td></tr>\n"
+                    for k, v in d["specs"])
+
+    box = "".join(f"          <li>{esc(b)}</li>\n" for b in d["box"])
+
+    revs = "".join(review_card(*r) for r in d["reviews"])
+
+    rel = "".join(product_card(o, base=base, href=f"../{o['slug']}/") for o in others)
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{esc(p['name'])} &mdash; {BRAND}</title>
+<meta name="description" content="{esc(d['hook'])} {money(p['price'])} with free US shipping, guaranteed on your doorstep before October 31st." />
+<meta name="robots" content="noindex" />
+<meta property="og:title" content="{esc(p['name'])} &mdash; {money(p['price'])}" />
+<meta property="og:description" content="{esc(d['hook'])}" />
+<meta property="og:type" content="product" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="{base}styles.css" />
+</head>
+<body class="pdp-page" data-base="{base}">
+
+{announce_html()}
+{header_html(base, home)}
+
+<main id="top">
+
+<!-- buy box -->
+<section class="pdp">
+  <div class="wrap pdp__in">
+
+    <div class="pdp__gal">
+      <div class="pdp__stage">
+        <span class="pdp__off">-{off}%</span>
+        <img id="pdpimg" src="{img}.svg" alt="{esc(p['name'])}" width="600" height="600" />
+      </div>
+      <div class="pdp__thumbs">
+{thumbs}      </div>
+    </div>
+
+    <div class="pdp__buy">
+      <p class="pdp__crumb"><a href="{home}#shop">Shop</a> <span>/</span> {esc(p['name'])}</p>
+      <h1 class="pdp__h">{esc(p['name'])}</h1>
+      <div class="pdp__rate">{stars(p['rating'])}<span class="pdp__rc">{p['rating']} &middot; {p['reviews']:,} reviews</span></div>
+      <p class="pdp__hook">{esc(d['hook'])}</p>
+
+      <div class="pdp__price">
+        <span class="price">{money(p['price'])}</span>
+        <span class="was">{money(p['was'])}</span>
+        <span class="pdp__save">You save {money(save)}</span>
+      </div>
+
+      <ul class="pdp__bul">
+{bullets}      </ul>
+
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
+
+      <div class="pdp__act">
+        <div class="qty" id="qty">
+          <button type="button" data-q="-1" aria-label="Decrease quantity">&minus;</button>
+          <b id="qtyn">1</b>
+          <button type="button" data-q="1" aria-label="Increase quantity">+</button>
+        </div>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="{p['slug']}" data-name="{esc(p['name'], quote=True)}" data-price="{p['price']}" data-qty="qty">
+          Add to Cart &mdash; {money(p['price'])}
+        </button>
+      </div>
+
+      <ul class="pdp__trust">
+        <li>Free US shipping, no minimum</li>
+        <li>Guaranteed delivered before Oct 31 or it's free</li>
+        <li>Ships within 24 hours from a US warehouse</li>
+        <li>30-day returns, no questions asked</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- features -->
+<section class="sec sec--alt">
+  <div class="wrap">
+    <p class="sec__k">Why this one</p>
+    <h2 class="sec__h">What makes it worth it</h2>
+    <div class="feats">
+{features}    </div>
+  </div>
+</section>
+
+<!-- specs + box -->
+<section class="sec">
+  <div class="wrap spec">
+    <div class="spec__tbl">
+      <h2 class="sec__h">Specifications</h2>
+      <table>
+        <tbody>
+{specs}        </tbody>
+      </table>
+    </div>
+    <div class="spec__box">
+      <h2 class="sec__h">In the box</h2>
+      <ul class="ticks">
+{box}      </ul>
+      <img class="spec__art" src="{img}-detail.svg" alt="" aria-hidden="true" width="600" height="600" />
+    </div>
+  </div>
+</section>
+
+<!-- reviews -->
+<section class="sec sec--alt" id="reviews">
+  <div class="wrap">
+    <p class="sec__k">{p['rating']} average from {p['reviews']:,} orders</p>
+    <h2 class="sec__h">What buyers say</h2>
+    <div class="revs">
+{revs}    </div>
+  </div>
+</section>
+
+<!-- faq -->
+<section class="sec" id="faq">
+  <div class="wrap wrap--narrow">
+    <p class="sec__k">Before you ask</p>
+    <h2 class="sec__h">Questions</h2>
+    <div class="faq">
+{"".join(faq_item(*f) for f in FAQ)}    </div>
+  </div>
+</section>
+
+<!-- related -->
+<section class="sec sec--alt">
+  <div class="wrap">
+    <p class="sec__k">Goes with it</p>
+    <h2 class="sec__h">People also bought</h2>
+    <div class="grid">
+{rel}    </div>
+  </div>
+</section>
+
+</main>
+
+{footer_html(base, home)}
+{cart_html()}
+
+<!-- sticky mobile buy bar -->
+<div class="stick" id="stick" aria-hidden="true">
+  <img src="{img}.svg" alt="" width="600" height="600" />
+  <div class="stick__m">
+    <p>{esc(p['name'])}</p>
+    <span><b>{money(p['price'])}</b> <s>{money(p['was'])}</s></span>
+  </div>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="{p['slug']}" data-name="{esc(p['name'], quote=True)}" data-price="{p['price']}">
+    Add
+  </button>
+</div>
+
+<script src="{base}script.js"></script>
+</body>
+</html>
+"""
+
+
 def build():
     os.makedirs(ART_DIR, exist_ok=True)
-    for slug, svg in ARTWORK.items():
-        with open(os.path.join(ART_DIR, f"{slug}.svg"), "w", encoding="utf-8") as f:
-            f.write(svg)
+    n_art = 0
+    for slug, (label, glow, body) in ARTWORK.items():
+        for suffix, render in VIEWS:
+            with open(os.path.join(ART_DIR, f"{slug}{suffix}.svg"), "w", encoding="utf-8") as f:
+                f.write(render(label, glow, body))
+            n_art += 1
 
     page = f"""<!DOCTYPE html>
 <html lang="en">
@@ -395,32 +897,8 @@ def build():
 </head>
 <body>
 
-<!-- announcement -->
-<div class="ann">
-  <p>FREE US SHIPPING ON EVERYTHING &nbsp;&middot;&nbsp; Order by Oct 20 and it lands before Halloween &nbsp;&middot;&nbsp; <strong id="ann-count">&nbsp;</strong></p>
-</div>
-
-<!-- header -->
-<header class="hdr" id="hdr">
-  <div class="wrap hdr__in">
-    <a class="logo" href="#top">{LOGO}<span class="logo__txt">Hollow<em>&amp;</em>Hex</span></a>
-    <nav class="nav" id="nav">
-      <a href="#shop">Shop All</a>
-      <a href="#cats">Categories</a>
-      <a href="#why">Why Us</a>
-      <a href="#reviews">Reviews</a>
-      <a href="#faq">FAQ</a>
-    </nav>
-    <div class="hdr__act">
-      <button class="cartbtn" id="cartbtn" type="button" aria-label="Open cart">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-1.6 9.2a2 2 0 0 1-2 1.8H9.3a2 2 0 0 1-2-1.7L5.4 3.7A1 1 0 0 0 4.4 3H2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/></svg>
-        <span class="cartbtn__n" id="cartn">0</span>
-      </button>
-      <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
-    </div>
-  </div>
-</header>
-
+{announce_html()}
+{header_html("", "")}
 <!-- hero -->
 <section class="hero" id="top">
   <div class="hero__glow" aria-hidden="true"></div>
@@ -524,40 +1002,8 @@ def build():
   </div>
 </section>
 
-<footer class="ftr">
-  <div class="wrap ftr__in">
-    <div class="ftr__brand">
-      <a class="logo" href="#top">{LOGO}<span class="logo__txt">Hollow<em>&amp;</em>Hex</span></a>
-      <p>Animatronics, fog and yard decor, shipped free across the US and guaranteed before October 31st.</p>
-    </div>
-    <div class="ftr__col"><h4>Shop</h4><a href="#shop">Best Sellers</a><a href="#cats">Animatronics</a><a href="#cats">Yard &amp; Decor</a><a href="#cats">Costumes</a><a href="#cats">Pet Costumes</a></div>
-    <div class="ftr__col"><h4>Help</h4><a href="#faq">Shipping</a><a href="#faq">Returns</a><a href="#faq">Track My Order</a><a href="#faq">Contact</a></div>
-    <div class="ftr__col"><h4>Company</h4><a href="#why">About</a><a href="#reviews">Reviews</a><a href="#faq">Privacy</a><a href="#faq">Terms</a></div>
-  </div>
-  <div class="wrap ftr__base">
-    <p>&copy; 2026 {BRAND}. Demo storefront built for review &mdash; not a live shop.</p>
-    <p class="ftr__pay"><span>VISA</span><span>MC</span><span>AMEX</span><span>PayPal</span><span>Shop&nbsp;Pay</span></p>
-  </div>
-</footer>
-
-<!-- cart drawer -->
-<div class="scrim" id="scrim" hidden></div>
-<aside class="cart" id="cart" aria-label="Shopping cart" aria-hidden="true">
-  <div class="cart__hd">
-    <h2>Your Cart</h2>
-    <button class="cart__x" id="cartx" type="button" aria-label="Close cart">&times;</button>
-  </div>
-  <div class="cart__body" id="cartbody"></div>
-  <div class="cart__ft">
-    <div class="cart__row"><span>Subtotal</span><b id="carttot">$0.00</b></div>
-    <div class="cart__row cart__row--ship"><span>Shipping</span><b>FREE</b></div>
-    <button class="btn btn--gold btn--wide" type="button" id="checkout">Checkout</button>
-    <p class="cart__note">Demo storefront &mdash; checkout is not connected to a payment provider.</p>
-  </div>
-</aside>
-
-<div class="toast" id="toast" role="status"></div>
-
+{footer_html("", "")}
+{cart_html()}
 <script src="script.js"></script>
 </body>
 </html>
@@ -566,8 +1012,24 @@ def build():
     with open(os.path.join(HERE, "index.html"), "w", encoding="utf-8") as f:
         f.write(page)
 
+    # One landing page per product, each at its own URL: /p/<slug>/
+    total = 0
+    for i, p in enumerate(PRODUCTS):
+        # rotate the "people also bought" row so it isn't the same three items
+        # on every page - it should look like a shop, not a template
+        rotated = PRODUCTS[i + 1:] + PRODUCTS[:i]
+        others = rotated[:3]
+        out_dir = os.path.join(HERE, "p", p["slug"])
+        os.makedirs(out_dir, exist_ok=True)
+        doc = landing_page(p, others)
+        with open(os.path.join(out_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(doc)
+        total += len(doc)
+
     print(f"index.html written ({len(page):,} bytes)")
-    print(f"{len(ARTWORK)} product SVGs written to assets/products/")
+    print(f"{len(PRODUCTS)} landing pages written to p/<slug>/index.html ({total:,} bytes)")
+    print(f"{n_art} product SVGs written to assets/products/ "
+          f"({len(ARTWORK)} products x {len(VIEWS)} views)")
 
 
 if __name__ == "__main__":

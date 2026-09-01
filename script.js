@@ -9,12 +9,24 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var money = function (n) { return '$' + n.toFixed(2); };
 
+  /* This file is shared by the homepage and every product landing page, and
+     the landing pages sit two directories down at /p/<slug>/. Two consequences
+     run through everything below:
+       1. asset paths must be prefixed with BASE, not hardcoded
+       2. every element lookup must tolerate absence - a landing page has no
+          email capture, the homepage has no gallery */
+  var BASE = (document.body.getAttribute('data-base') || '');
+
+  /* Bind only if the element is actually on this page. */
+  function on(el, ev, fn) { if (el) { el.addEventListener(ev, fn); } }
+
   /* ---------------------------------------------------------
      Header: solid background once you leave the very top
      --------------------------------------------------------- */
   var hdr = $('#hdr');
   var onScroll = function () {
-    hdr.classList.toggle('hdr--solid', window.scrollY > 24);
+    if (hdr) { hdr.classList.toggle('hdr--solid', window.scrollY > 24); }
+    stickBar();
   };
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -24,7 +36,7 @@
      --------------------------------------------------------- */
   var burger = $('#burger');
   var nav = $('#nav');
-  burger.addEventListener('click', function () {
+  on(burger, 'click', function () {
     var open = nav.classList.toggle('on');
     burger.classList.toggle('on', open);
     burger.setAttribute('aria-expanded', String(open));
@@ -61,10 +73,10 @@
     var h = Math.floor((s % 86400) / 3600);
     var m = Math.floor((s % 3600) / 60);
     var sec = s % 60;
-    cd.d.textContent = pad(d);
-    cd.h.textContent = pad(h);
-    cd.m.textContent = pad(m);
-    cd.s.textContent = pad(sec);
+    if (cd.d) { cd.d.textContent = pad(d); }
+    if (cd.h) { cd.h.textContent = pad(h); }
+    if (cd.m) { cd.m.textContent = pad(m); }
+    if (cd.s) { cd.s.textContent = pad(sec); }
     if (cd.ann) {
       cd.ann.textContent = d + (d === 1 ? ' DAY' : ' DAYS') + ' TO HALLOWEEN';
     }
@@ -99,6 +111,7 @@
   }
 
   function render() {
+    if (!bodyEl || !nEl || !totEl) { return; }
     var n = count();
     nEl.textContent = String(n);
     nEl.classList.toggle('on', n > 0);
@@ -111,7 +124,7 @@
 
     bodyEl.innerHTML = cart.map(function (i) {
       return '<div class="ci" data-slug="' + i.slug + '">' +
-        '<img src="assets/products/' + i.slug + '.svg" alt="" />' +
+        '<img src="' + BASE + 'assets/products/' + i.slug + '.svg" alt="" />' +
         '<div class="ci__m">' +
           '<p class="ci__n">' + i.name + '</p>' +
           '<p class="ci__p">' + money(i.price * i.qty) + '</p>' +
@@ -130,6 +143,7 @@
   }
 
   function openCart() {
+    if (!scrim || !cartEl) { return; }
     scrim.hidden = false;
     requestAnimationFrame(function () {
       scrim.classList.add('on');
@@ -140,6 +154,7 @@
   }
 
   function closeCart() {
+    if (!scrim || !cartEl) { return; }
     scrim.classList.remove('on');
     cartEl.classList.remove('on');
     cartEl.setAttribute('aria-hidden', 'true');
@@ -147,15 +162,15 @@
     setTimeout(function () { scrim.hidden = true; }, 300);
   }
 
-  $('#cartbtn').addEventListener('click', openCart);
-  $('#cartx').addEventListener('click', closeCart);
-  scrim.addEventListener('click', closeCart);
+  on($('#cartbtn'), 'click', openCart);
+  on($('#cartx'), 'click', closeCart);
+  on(scrim, 'click', closeCart);
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && cartEl.classList.contains('on')) { closeCart(); }
+    if (e.key === 'Escape' && cartEl && cartEl.classList.contains('on')) { closeCart(); }
   });
 
   /* quantity + remove, delegated so re-rendered rows keep working */
-  bodyEl.addEventListener('click', function (e) {
+  on(bodyEl, 'click', function (e) {
     var row = e.target.closest('.ci');
     if (!row) { return; }
     var slug = row.getAttribute('data-slug');
@@ -176,37 +191,46 @@
     render();
   });
 
-  /* add to cart */
+  /* add to cart. A button may carry data-qty pointing at a stepper, which is
+     how the landing page adds 3 of something in one click. */
   $$('[data-add]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var slug = btn.getAttribute('data-add');
+      var stepper = btn.getAttribute('data-qty');
+      var add = 1;
+      if (stepper) {
+        var el = document.getElementById(stepper);
+        var read = el && parseInt(el.querySelector('b').textContent, 10);
+        if (read > 0) { add = read; }
+      }
+
       var found = cart.filter(function (i) { return i.slug === slug; })[0];
       if (found) {
-        found.qty += 1;
+        found.qty += add;
       } else {
         cart.push({
           slug: slug,
           name: btn.getAttribute('data-name'),
           price: parseFloat(btn.getAttribute('data-price')),
-          qty: 1
+          qty: add
         });
       }
       save();
       render();
 
-      var label = btn.textContent;
+      var label = btn.innerHTML;
       btn.textContent = 'Added';
       btn.classList.add('done');
       setTimeout(function () {
-        btn.textContent = label;
+        btn.innerHTML = label;
         btn.classList.remove('done');
       }, 1100);
 
-      toast(btn.getAttribute('data-name') + ' added to cart');
+      toast(btn.getAttribute('data-name') + (add > 1 ? ' x' + add : '') + ' added to cart');
     });
   });
 
-  $('#checkout').addEventListener('click', function () {
+  on($('#checkout'), 'click', function () {
     if (!cart.length) { toast('Your cart is empty'); return; }
     toast('Demo store - checkout is not connected yet');
   });
@@ -219,6 +243,7 @@
   var toastEl = $('#toast');
   var toastTimer = null;
   function toast(msg) {
+    if (!toastEl) { return; }
     toastEl.textContent = msg;
     toastEl.classList.add('on');
     clearTimeout(toastTimer);
@@ -229,7 +254,7 @@
      Email capture
      --------------------------------------------------------- */
   var form = $('#capform');
-  form.addEventListener('submit', function (e) {
+  on(form, 'submit', function (e) {
     e.preventDefault();
     var input = $('#capmail');
     var msg = $('#capmsg');
@@ -245,9 +270,45 @@
   });
 
   /* ---------------------------------------------------------
+     Product landing page: gallery, quantity, sticky buy bar.
+     All three no-op on the homepage.
+     --------------------------------------------------------- */
+  var pdpImg = $('#pdpimg');
+  $$('.pdp__thumb').forEach(function (t) {
+    t.addEventListener('click', function () {
+      if (!pdpImg) { return; }
+      pdpImg.src = t.getAttribute('data-view');
+      $$('.pdp__thumb').forEach(function (o) { o.classList.remove('on'); });
+      t.classList.add('on');
+    });
+  });
+
+  var qtyBox = $('#qty');
+  var qtyN = $('#qtyn');
+  on(qtyBox, 'click', function (e) {
+    var step = e.target.getAttribute && e.target.getAttribute('data-q');
+    if (!step) { return; }
+    var v = parseInt(qtyN.textContent, 10) + parseInt(step, 10);
+    /* clamped, so a fast clicker can't reach 0 or -3 and add nothing */
+    qtyN.textContent = String(Math.min(20, Math.max(1, v)));
+  });
+
+  /* The bar appears once the real buy button has scrolled past, and hides
+     again when it comes back - two of them on screen at once is clutter. */
+  var stick = $('#stick');
+  var buyBtn = $('.pdp__act .btn--add');
+  function stickBar() {
+    if (!stick || !buyBtn) { return; }
+    var past = buyBtn.getBoundingClientRect().bottom < 0;
+    stick.classList.toggle('on', past);
+    stick.setAttribute('aria-hidden', String(!past));
+  }
+  stickBar();
+
+  /* ---------------------------------------------------------
      Reveal on scroll
      --------------------------------------------------------- */
-  var targets = $$('.cat, .card, .rev, .trust__i, .why__txt, .why__art, .faq__item');
+  var targets = $$('.cat, .card, .rev, .trust__i, .why__txt, .why__art, .faq__item, .feat');
   targets.forEach(function (el) { el.classList.add('rv'); });
 
   if ('IntersectionObserver' in window) {

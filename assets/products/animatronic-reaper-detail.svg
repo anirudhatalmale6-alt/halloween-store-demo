@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Animatronic reaper detail">
+<defs>
+<radialGradient id="g" cx="50%" cy="42%" r="58%">
+<stop offset="0%" stop-color="#a06bff" stop-opacity=".6"/>
+<stop offset="60%" stop-color="#a06bff" stop-opacity=".16"/>
+<stop offset="100%" stop-color="#a06bff" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<circle cx="300" cy="260" r="290" fill="url(#g)"/>
+<!-- 1.34, not 1.6. A harder zoom cropped the legs off the spider and the head
+     off the dog, and a close-up you cannot identify is worse than no close-up -->
+<g transform="translate(300 262) scale(1.34) translate(-300 -280)">
+
+<path d="M470 92 404 500" stroke="#6b5540" stroke-width="15" stroke-linecap="round"/>
+<path d="M470 92c60 8 98 46 106 100-56-44-96-52-124-38z" fill="#f4efe6"/>
+<path d="M196 268 118 350M404 268l78 82" stroke="#241a33" stroke-width="34" stroke-linecap="round"/>
+<path d="M300 96c-66 0-108 44-108 106 0 26 6 44 6 62l-48 236 32-38 28 38 28-38 28 38 28-38 28 38 28-38 32 38-48-236c0-18 6-36 6-62 0-62-42-106-108-106z"
+      fill="#241a33" stroke="#a06bff" stroke-width="7" stroke-linejoin="round"/>
+<ellipse cx="300" cy="200" rx="66" ry="76" fill="#05040a"/>
+<path d="M300 150c-31 0-51 22-51 53 0 18 8 31 18 39v20c0 8 6 13 14 13h38c8 0 14-5 14-13v-20c10-8 18-21 18-39 0-31-20-53-51-53z" fill="#f4efe6"/>
+<ellipse cx="282" cy="201" rx="13" ry="15" fill="#7bff6a"/>
+<ellipse cx="318" cy="201" rx="13" ry="15" fill="#7bff6a"/>
+<path d="M300 216l-8 15h16z" fill="#05040a"/>
+<g stroke="#05040a" stroke-width="3.5"><path d="M288 244v14M300 244v14M312 244v14"/></g>
+
+</g>
+</svg>

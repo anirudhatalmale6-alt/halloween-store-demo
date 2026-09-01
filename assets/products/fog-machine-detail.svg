@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Fog machine detail">
+<defs>
+<radialGradient id="g" cx="50%" cy="42%" r="58%">
+<stop offset="0%" stop-color="#7bff6a" stop-opacity=".6"/>
+<stop offset="60%" stop-color="#7bff6a" stop-opacity=".16"/>
+<stop offset="100%" stop-color="#7bff6a" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<circle cx="300" cy="260" r="290" fill="url(#g)"/>
+<!-- 1.34, not 1.6. A harder zoom cropped the legs off the spider and the head
+     off the dog, and a close-up you cannot identify is worse than no close-up -->
+<g transform="translate(300 262) scale(1.34) translate(-300 -280)">
+
+<defs><filter id="fb" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="22"/></filter></defs>
+<g fill="#7bff6a" filter="url(#fb)">
+<g opacity=".2"><circle cx="150" cy="296" r="58"/><circle cx="452" cy="292" r="60"/><circle cx="300" cy="316" r="80"/></g>
+<g opacity=".26"><circle cx="202" cy="252" r="70"/><circle cx="294" cy="222" r="92"/><circle cx="394" cy="250" r="74"/><circle cx="246" cy="292" r="60"/><circle cx="352" cy="290" r="62"/></g>
+<g opacity=".3"><circle cx="256" cy="180" r="42"/><circle cx="348" cy="188" r="34"/><circle cx="300" cy="152" r="30"/></g>
+</g>
+<rect x="164" y="352" width="272" height="140" rx="18" fill="#191324" stroke="#7bff6a" stroke-width="8"/>
+<rect x="196" y="384" width="112" height="44" rx="8" fill="#07060a"/>
+<circle cx="352" cy="406" r="20" fill="#ff7518"/>
+<circle cx="404" cy="406" r="20" fill="#7bff6a"/>
+<rect x="196" y="446" width="208" height="12" rx="6" fill="#7bff6a" opacity=".45"/>
+<path d="M436 400h74a20 20 0 0 1 20 20v34" stroke="#4b4160" stroke-width="12" fill="none" stroke-linecap="round"/>
+
+</g>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="LED pumpkin string lights detail">
+<defs>
+<radialGradient id="g" cx="50%" cy="42%" r="58%">
+<stop offset="0%" stop-color="#ff7518" stop-opacity=".6"/>
+<stop offset="60%" stop-color="#ff7518" stop-opacity=".16"/>
+<stop offset="100%" stop-color="#ff7518" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<circle cx="300" cy="260" r="290" fill="url(#g)"/>
+<!-- 1.34, not 1.6. A harder zoom cropped the legs off the spider and the head
+     off the dog, and a close-up you cannot identify is worse than no close-up -->
+<g transform="translate(300 262) scale(1.34) translate(-300 -280)">
+
+<path d="M40 150q140 120 260 0t260 120" stroke="#4b4160" stroke-width="9" fill="none"/>
+<g>
+<g transform="translate(112 208)">
+<ellipse rx="52" ry="46" fill="#ff7518"/>
+<path d="M-4-46v-22h8v22z" fill="#4c7a2a"/>
+<path d="M-26-6 -14 12h-24zM26-6 38 12H14zM-24 22q24 20 48 0z" fill="#2a1405"/>
+</g>
+<g transform="translate(300 300)">
+<ellipse rx="62" ry="54" fill="#ff7518"/>
+<path d="M-5-54v-26h10v26z" fill="#4c7a2a"/>
+<path d="M-31-8-17 14h-28zM31-8 45 14H17zM-28 26q28 24 56 0z" fill="#2a1405"/>
+</g>
+<g transform="translate(492 366)">
+<ellipse rx="52" ry="46" fill="#ff7518"/>
+<path d="M-4-46v-22h8v22z" fill="#4c7a2a"/>
+<path d="M-26-6-14 12h-24zM26-6 38 12H14zM-24 22q24 20 48 0z" fill="#2a1405"/>
+</g>
+</g>
+
+</g>
+</svg>
