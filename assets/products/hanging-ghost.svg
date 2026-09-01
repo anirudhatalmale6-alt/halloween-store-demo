@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Hanging ghost">
+<defs>
+<radialGradient id="g" cx="50%" cy="46%" r="52%">
+<stop offset="0%" stop-color="#f4efe6" stop-opacity=".55"/>
+<stop offset="55%" stop-color="#f4efe6" stop-opacity=".14"/>
+<stop offset="100%" stop-color="#f4efe6" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="600" height="600" fill="none"/>
+<circle cx="300" cy="280" r="250" fill="url(#g)"/>
+
+<path d="M300 60v72" stroke="#584a6b" stroke-width="7"/>
+<path d="M300 128c-84 0-136 62-136 148v242l40-46 38 46 38-46 40 46 38-46 40 46 38-46V276c0-86-52-148-136-148z"
+      fill="#f4efe6" opacity=".93"/>
+<ellipse cx="256" cy="276" rx="21" ry="27" fill="#0b0810"/>
+<ellipse cx="344" cy="276" rx="21" ry="27" fill="#0b0810"/>
+<ellipse cx="300" cy="352" rx="29" ry="37" fill="#0b0810"/>
+
+</svg>

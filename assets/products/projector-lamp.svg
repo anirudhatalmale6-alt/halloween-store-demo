@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Halloween projector lamp">
+<defs>
+<radialGradient id="g" cx="50%" cy="46%" r="52%">
+<stop offset="0%" stop-color="#a06bff" stop-opacity=".55"/>
+<stop offset="55%" stop-color="#a06bff" stop-opacity=".14"/>
+<stop offset="100%" stop-color="#a06bff" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="600" height="600" fill="none"/>
+<circle cx="300" cy="280" r="250" fill="url(#g)"/>
+
+<path d="M206 262 540 130v340L206 338z" fill="#a06bff" opacity=".2"/>
+<rect x="86" y="238" width="132" height="124" rx="24" fill="#191324" stroke="#a06bff" stroke-width="8"/>
+<circle cx="216" cy="300" r="34" fill="#07060a" stroke="#a06bff" stroke-width="7"/>
+<circle cx="216" cy="300" r="14" fill="#7bff6a"/>
+<path d="M152 362v56h-40M152 418h80" stroke="#4b4160" stroke-width="12" fill="none" stroke-linecap="round"/>
+<g fill="#f4efe6" opacity=".88">
+<g transform="translate(408 200) scale(.85)"><path d="M7-8 58-18 50 12Q40-2 30 6 18-4 7 4Z"/><path d="M-7-8-58-18-50 12Q-40-2-30 6-18-4-7 4Z"/><ellipse cy="-2" rx="9" ry="14"/><path d="M-6-14-8-24 0-18Z"/><path d="M6-14 8-24 0-18Z"/></g>
+<g transform="translate(468 306) scale(1.15)"><path d="M7-8 58-18 50 12Q40-2 30 6 18-4 7 4Z"/><path d="M-7-8-58-18-50 12Q-40-2-30 6-18-4-7 4Z"/><ellipse cy="-2" rx="9" ry="14"/><path d="M-6-14-8-24 0-18Z"/><path d="M6-14 8-24 0-18Z"/></g>
+<g transform="translate(414 408) scale(.7)"><path d="M7-8 58-18 50 12Q40-2 30 6 18-4 7 4Z"/><path d="M-7-8-58-18-50 12Q-40-2-30 6-18-4-7 4Z"/><ellipse cy="-2" rx="9" ry="14"/><path d="M-6-14-8-24 0-18Z"/><path d="M6-14 8-24 0-18Z"/></g>
+</g>
+
+</svg>

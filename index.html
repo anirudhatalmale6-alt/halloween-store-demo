@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hollow & Hex &mdash; Haunt Your House. Ship It Free.</title>
+<meta name="description" content="Animatronics, fog, yard decor and costumes shipped free across the US and guaranteed to land before October 31st." />
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- announcement -->
+<div class="ann">
+  <p>FREE US SHIPPING ON EVERYTHING &nbsp;&middot;&nbsp; Order by Oct 20 and it lands before Halloween &nbsp;&middot;&nbsp; <strong id="ann-count">&nbsp;</strong></p>
+</div>
+
+<!-- header -->
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+    <a class="logo" href="#top"><svg class="logo__mark" viewBox="0 0 64 64" aria-hidden="true">
+  <path d="M30 12h5l-1 9h-4z" fill="#4c7a2a"/>
+  <path d="M35 14c6-5 13-5 15 0-6 0-11 2-13 5z" fill="#4c7a2a"/>
+  <ellipse cx="32" cy="39" rx="27" ry="23" fill="#ff7518"/>
+  <path d="M15 30h13l-6.5 12z" fill="#0c0810"/>
+  <path d="M36 30h13l-6.5 12z" fill="#0c0810"/>
+  <path d="M32 38l-4.5 8h9z" fill="#0c0810"/>
+  <path d="M15 46q17 15 34 0-3 12-17 12t-17-12z" fill="#0c0810"/>
+  <g fill="#ff7518"><path d="M24 50l3 5h-6z"/><path d="M32 51l3 6h-6z"/><path d="M40 50l3 5h-6z"/></g>
+</svg><span class="logo__txt">Hollow<em>&amp;</em>Hex</span></a>
+    <nav class="nav" id="nav">
+      <a href="#shop">Shop All</a>
+      <a href="#cats">Categories</a>
+      <a href="#why">Why Us</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="hdr__act">
+      <button class="cartbtn" id="cartbtn" type="button" aria-label="Open cart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-1.6 9.2a2 2 0 0 1-2 1.8H9.3a2 2 0 0 1-2-1.7L5.4 3.7A1 1 0 0 0 4.4 3H2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/></svg>
+        <span class="cartbtn__n" id="cartn">0</span>
+      </button>
+      <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- hero -->
+<section class="hero" id="top">
+  <div class="hero__glow" aria-hidden="true"></div>
+  <div class="wrap hero__in">
+    <p class="hero__k">Halloween 2026 Collection</p>
+    <h1 class="hero__h">Haunt Your House.<br /><span>Ship It Free.</span></h1>
+    <p class="hero__p">Animatronics, fog, yard giants and costumes &mdash; shipped free anywhere in the US and guaranteed on your doorstep before October 31st.</p>
+    <div class="hero__cta">
+      <a class="btn btn--gold" href="#shop">Shop the Collection</a>
+      <a class="btn btn--ghost" href="#cats">Browse Categories</a>
+    </div>
+    <div class="cdown" id="cdown" aria-label="Countdown to Halloween">
+      <div class="cdown__cell"><b id="cd-d">--</b><span>Days</span></div>
+      <div class="cdown__cell"><b id="cd-h">--</b><span>Hours</span></div>
+      <div class="cdown__cell"><b id="cd-m">--</b><span>Minutes</span></div>
+      <div class="cdown__cell"><b id="cd-s">--</b><span>Seconds</span></div>
+      <p class="cdown__lbl">until Halloween</p>
+    </div>
+  </div>
+</section>
+
+<!-- trust -->
+<section class="trust">
+  <div class="wrap trust__in">
+    <div class="trust__i"><b>Free US Shipping</b><span>On every order, no minimum</span></div>
+    <div class="trust__i"><b>Ships in 24 Hours</b><span>Order by 3pm, out the same day</span></div>
+    <div class="trust__i"><b>Delivered Before Oct 31</b><span>Guaranteed or it&#x27;s free</span></div>
+    <div class="trust__i"><b>30-Day Returns</b><span>Unopened, no questions asked</span></div>
+  </div>
+</section>
+
+<!-- categories -->
+<section class="sec" id="cats">
+  <div class="wrap">
+    <p class="sec__k">Shop by</p>
+    <h2 class="sec__h">Categories</h2>
+    <div class="cats">
+      <a class="cat" href="#shop">
+        <img src="assets/products/animatronic-reaper.svg" alt="" aria-hidden="true" loading="lazy" width="600" height="600" />
+        <div class="cat__txt"><h3>Animatronics</h3><p>The ones that move, scream and ruin trick-or-treaters</p></div>
+      </a>
+      <a class="cat" href="#shop">
+        <img src="assets/products/inflatable-spider.svg" alt="" aria-hidden="true" loading="lazy" width="600" height="600" />
+        <div class="cat__txt"><h3>Yard &amp; Decor</h3><p>Inflatables, tombstones, fog and lighting</p></div>
+      </a>
+      <a class="cat" href="#shop">
+        <img src="assets/products/reaper-costume.svg" alt="" aria-hidden="true" loading="lazy" width="600" height="600" />
+        <div class="cat__txt"><h3>Costumes</h3><p>Adults, kids and everything in between</p></div>
+      </a>
+      <a class="cat" href="#shop">
+        <img src="assets/products/pet-costume.svg" alt="" aria-hidden="true" loading="lazy" width="600" height="600" />
+        <div class="cat__txt"><h3>Pet Costumes</h3><p>The category that sells itself on video</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- products -->
+<section class="sec sec--alt" id="shop">
+  <div class="wrap">
+    <p class="sec__k">Selling fast</p>
+    <h2 class="sec__h">This Season's Best Sellers</h2>
+    <p class="sec__sub">Every item ships free and is in stock right now. Prices hold until October 31st.</p>
+    <div class="grid">
+      <article class="card" data-slug="animatronic-reaper">
+        <div class="card__media">
+          <span class="badge">Best Seller</span>
+          <span class="card__off">-40%</span>
+          <img src="assets/products/animatronic-reaper.svg" alt="Life-Size Animatronic Reaper" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--half">&#9733;</span><span class="card__rcount">4.8 (412)</span></div>
+          <h3 class="card__name">Life-Size Animatronic Reaper</h3>
+          <p class="card__blurb">5ft 8in, motion-activated. Head turns, eyes light up, and it screams. The one the neighbours talk about.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$89.99</span><span class="was">$149.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="animatronic-reaper" data-name="Life-Size Animatronic Reaper" data-price="89.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card" data-slug="fog-machine">
+        <div class="card__media">
+          <span class="badge">Best Seller</span>
+          <span class="card__off">-38%</span>
+          <img src="assets/products/fog-machine.svg" alt="1000W Fog Machine + LED Lights" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--half">&#9733;</span><span class="card__rcount">4.7 (1,284)</span></div>
+          <h3 class="card__name">1000W Fog Machine + LED Lights</h3>
+          <p class="card__blurb">Fills a driveway in under a minute. Wireless remote, 12 colour LEDs, 1L tank.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$49.99</span><span class="was">$79.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="fog-machine" data-name="1000W Fog Machine + LED Lights" data-price="49.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card" data-slug="hanging-ghost">
+        <div class="card__media">
+          
+          <span class="card__off">-38%</span>
+          <img src="assets/products/hanging-ghost.svg" alt="Motion-Sensor Hanging Ghost" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--half">&#9733;</span><span class="card__rcount">4.6 (903)</span></div>
+          <h3 class="card__name">Motion-Sensor Hanging Ghost</h3>
+          <p class="card__blurb">Drops, glows and shrieks when anyone walks under it. Hangs from any porch hook.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$24.99</span><span class="was">$39.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="hanging-ghost" data-name="Motion-Sensor Hanging Ghost" data-price="24.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card" data-slug="pet-costume">
+        <div class="card__media">
+          <span class="badge">Viral on TikTok</span>
+          <span class="card__off">-37%</span>
+          <img src="assets/products/pet-costume.svg" alt="Glow Skeleton Dog Costume" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--half">&#9733;</span><span class="card__rcount">4.9 (2,107)</span></div>
+          <h3 class="card__name">Glow Skeleton Dog Costume</h3>
+          <p class="card__blurb">Glow-in-the-dark ribcage, machine washable, sizes XS to XXL. Cats too.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$18.99</span><span class="was">$29.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="pet-costume" data-name="Glow Skeleton Dog Costume" data-price="18.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card" data-slug="projector-lamp">
+        <div class="card__media">
+          
+          <span class="card__off">-42%</span>
+          <img src="assets/products/projector-lamp.svg" alt="Halloween Projector Lamp" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--half">&#9733;</span><span class="card__rcount">4.5 (658)</span></div>
+          <h3 class="card__name">Halloween Projector Lamp</h3>
+          <p class="card__blurb">16 sliding scenes - bats, ghosts, spiders. Covers a whole house wall. Indoor or outdoor.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$34.99</span><span class="was">$59.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="projector-lamp" data-name="Halloween Projector Lamp" data-price="34.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card" data-slug="window-clings">
+        <div class="card__media">
+          <span class="badge">Under $15</span>
+          <span class="card__off">-41%</span>
+          <img src="assets/products/window-clings.svg" alt="Bloody Handprint Clings (24pc)" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star">&#9733;</span><span class="card__rcount">4.4 (531)</span></div>
+          <h3 class="card__name">Bloody Handprint Clings (24pc)</h3>
+          <p class="card__blurb">Peel, stick, terrify. Leaves no residue and reuses year after year.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$12.99</span><span class="was">$21.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="window-clings" data-name="Bloody Handprint Clings (24pc)" data-price="12.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card" data-slug="pumpkin-lights">
+        <div class="card__media">
+          
+          <span class="card__off">-39%</span>
+          <img src="assets/products/pumpkin-lights.svg" alt="LED Pumpkin String Lights (30ft)" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--half">&#9733;</span><span class="card__rcount">4.8 (1,749)</span></div>
+          <h3 class="card__name">LED Pumpkin String Lights (30ft)</h3>
+          <p class="card__blurb">50 warm pumpkins, 8 lighting modes, USB or battery. Weatherproof.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$19.99</span><span class="was">$32.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="pumpkin-lights" data-name="LED Pumpkin String Lights (30ft)" data-price="19.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card" data-slug="reaper-costume">
+        <div class="card__media">
+          
+          <span class="card__off">-40%</span>
+          <img src="assets/products/reaper-costume.svg" alt="Hooded Grim Reaper Costume" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--half">&#9733;</span><span class="card__rcount">4.6 (387)</span></div>
+          <h3 class="card__name">Hooded Grim Reaper Costume</h3>
+          <p class="card__blurb">Floor-length tattered robe, oversized hood, glowing eye insert included.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$44.99</span><span class="was">$74.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="reaper-costume" data-name="Hooded Grim Reaper Costume" data-price="44.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card" data-slug="inflatable-spider">
+        <div class="card__media">
+          <span class="badge">Low Stock</span>
+          <span class="card__off">-40%</span>
+          <img src="assets/products/inflatable-spider.svg" alt="8ft Inflatable Yard Spider" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--half">&#9733;</span><span class="card__rcount">4.7 (612)</span></div>
+          <h3 class="card__name">8ft Inflatable Yard Spider</h3>
+          <p class="card__blurb">Self-inflates in 40 seconds, lights from within, stakes and tethers included.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$59.99</span><span class="was">$99.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="inflatable-spider" data-name="8ft Inflatable Yard Spider" data-price="59.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="card" data-slug="witch-cauldron">
+        <div class="card__media">
+          
+          <span class="card__off">-40%</span>
+          <img src="assets/products/witch-cauldron.svg" alt="Bubbling Witch&#x27;s Cauldron" loading="lazy" width="600" height="600" />
+        </div>
+        <div class="card__body">
+          <div class="card__rating"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--half">&#9733;</span><span class="card__rcount">4.5 (274)</span></div>
+          <h3 class="card__name">Bubbling Witch&#x27;s Cauldron</h3>
+          <p class="card__blurb">Colour-changing mist bowl for the porch or the punch table. Just add water.</p>
+          <div class="card__foot">
+            <div class="card__price"><span class="price">$29.99</span><span class="was">$49.99</span></div>
+            <button class="btn btn--add" type="button"
+                    data-add="witch-cauldron" data-name="Bubbling Witch&#x27;s Cauldron" data-price="29.99">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- why -->
+<section class="sec" id="why">
+  <div class="wrap why">
+    <div class="why__txt">
+      <p class="sec__k">Why us</p>
+      <h2 class="sec__h">Halloween has a deadline.<br />We're built around it.</h2>
+      <p>Most stores treat October like any other month. We don't. Every order is picked and out the door within 24 hours, tracked end to end, and backed by a written guarantee: if it isn't on your doorstep by October 30th, you don't pay for it.</p>
+      <ul class="ticks">
+        <li>US warehouse stock &mdash; not a 6-week boat from overseas</li>
+        <li>Live tracking from the moment your label is printed</li>
+        <li>Damaged in transit? Photo it, we reship the same day</li>
+        <li>Real humans on chat 7 days a week through October</li>
+      </ul>
+      <a class="btn btn--gold" href="#shop">Start Shopping</a>
+    </div>
+    <div class="why__art">
+      <img src="assets/products/witch-cauldron.svg" alt="" aria-hidden="true" width="600" height="600" />
+    </div>
+  </div>
+</section>
+
+<!-- reviews -->
+<section class="sec sec--alt" id="reviews">
+  <div class="wrap">
+    <p class="sec__k">4.8 average from 8,900+ orders</p>
+    <h2 class="sec__h">What Buyers Say</h2>
+    <div class="revs">
+      <figure class="rev">
+        <div class="rev__stars"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span></div>
+        <blockquote>Ordered the reaper on a Tuesday, had it Friday. My street has a group chat and it is entirely about my front yard now.</blockquote>
+        <figcaption><strong>Marisa T.</strong><span>Philadelphia, PA</span><span class="rev__v">Verified buyer</span></figcaption>
+      </figure>
+      <figure class="rev">
+        <div class="rev__stars"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span></div>
+        <blockquote>The fog machine is genuinely too powerful for my porch and I could not be happier about that.</blockquote>
+        <figcaption><strong>Devon R.</strong><span>Austin, TX</span><span class="rev__v">Verified buyer</span></figcaption>
+      </figure>
+      <figure class="rev">
+        <div class="rev__stars"><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span><span class="star star--on">&#9733;</span></div>
+        <blockquote>Dog costume arrived in two days, fits my beagle perfectly, and the glow is real glow not a printed-on gimmick.</blockquote>
+        <figcaption><strong>Priya K.</strong><span>Chicago, IL</span><span class="rev__v">Verified buyer</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- email capture -->
+<section class="cap">
+  <div class="wrap cap__in">
+    <h2>Get 10% off your first order</h2>
+    <p>One email when the new drops land. Nothing else, and you can leave any time.</p>
+    <form class="cap__f" id="capform" novalidate>
+      <input type="email" id="capmail" placeholder="you@email.com" aria-label="Email address" required />
+      <button class="btn btn--gold" type="submit">Send My Code</button>
+    </form>
+    <p class="cap__msg" id="capmsg" role="status"></p>
+  </div>
+</section>
+
+<!-- faq -->
+<section class="sec" id="faq">
+  <div class="wrap wrap--narrow">
+    <p class="sec__k">Before you ask</p>
+    <h2 class="sec__h">Questions</h2>
+    <div class="faq">
+      <details class="faq__item">
+        <summary>Will it arrive before Halloween?<span class="faq__sign" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>Yes. Every order placed before October 20th is guaranteed to land on your doorstep by October 30th, or we refund you in full and you keep the item.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary>How much is shipping?<span class="faq__sign" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>Nothing. Shipping is free on every order in the continental US, with no minimum spend. Alaska, Hawaii and Canada are a flat $7.95.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary>Can I return something?<span class="faq__sign" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>Anything unopened can come back within 30 days for a full refund. If a item arrives damaged, send us a photo and we ship a replacement the same day - no return needed.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary>Are the animatronics loud?<span class="faq__sign" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>The reaper and the hanging ghost both have a three-level volume switch, including silent. Motion sensitivity is adjustable from 3ft to about 15ft.</p></div>
+      </details>
+      <details class="faq__item">
+        <summary>Do you ship outside the US?<span class="faq__sign" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>We ship to Canada, the UK, Ireland and Australia. Delivery runs 6-10 days, so international orders should go in before October 15th.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<footer class="ftr">
+  <div class="wrap ftr__in">
+    <div class="ftr__brand">
+      <a class="logo" href="#top"><svg class="logo__mark" viewBox="0 0 64 64" aria-hidden="true">
+  <path d="M30 12h5l-1 9h-4z" fill="#4c7a2a"/>
+  <path d="M35 14c6-5 13-5 15 0-6 0-11 2-13 5z" fill="#4c7a2a"/>
+  <ellipse cx="32" cy="39" rx="27" ry="23" fill="#ff7518"/>
+  <path d="M15 30h13l-6.5 12z" fill="#0c0810"/>
+  <path d="M36 30h13l-6.5 12z" fill="#0c0810"/>
+  <path d="M32 38l-4.5 8h9z" fill="#0c0810"/>
+  <path d="M15 46q17 15 34 0-3 12-17 12t-17-12z" fill="#0c0810"/>
+  <g fill="#ff7518"><path d="M24 50l3 5h-6z"/><path d="M32 51l3 6h-6z"/><path d="M40 50l3 5h-6z"/></g>
+</svg><span class="logo__txt">Hollow<em>&amp;</em>Hex</span></a>
+      <p>Animatronics, fog and yard decor, shipped free across the US and guaranteed before October 31st.</p>
+    </div>
+    <div class="ftr__col"><h4>Shop</h4><a href="#shop">Best Sellers</a><a href="#cats">Animatronics</a><a href="#cats">Yard &amp; Decor</a><a href="#cats">Costumes</a><a href="#cats">Pet Costumes</a></div>
+    <div class="ftr__col"><h4>Help</h4><a href="#faq">Shipping</a><a href="#faq">Returns</a><a href="#faq">Track My Order</a><a href="#faq">Contact</a></div>
+    <div class="ftr__col"><h4>Company</h4><a href="#why">About</a><a href="#reviews">Reviews</a><a href="#faq">Privacy</a><a href="#faq">Terms</a></div>
+  </div>
+  <div class="wrap ftr__base">
+    <p>&copy; 2026 Hollow & Hex. Demo storefront built for review &mdash; not a live shop.</p>
+    <p class="ftr__pay"><span>VISA</span><span>MC</span><span>AMEX</span><span>PayPal</span><span>Shop&nbsp;Pay</span></p>
+  </div>
+</footer>
+
+<!-- cart drawer -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="cart" id="cart" aria-label="Shopping cart" aria-hidden="true">
+  <div class="cart__hd">
+    <h2>Your Cart</h2>
+    <button class="cart__x" id="cartx" type="button" aria-label="Close cart">&times;</button>
+  </div>
+  <div class="cart__body" id="cartbody"></div>
+  <div class="cart__ft">
+    <div class="cart__row"><span>Subtotal</span><b id="carttot">$0.00</b></div>
+    <div class="cart__row cart__row--ship"><span>Shipping</span><b>FREE</b></div>
+    <button class="btn btn--gold btn--wide" type="button" id="checkout">Checkout</button>
+    <p class="cart__note">Demo storefront &mdash; checkout is not connected to a payment provider.</p>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
