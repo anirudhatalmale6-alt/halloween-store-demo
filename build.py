@@ -5,15 +5,71 @@ Hollow & Hex - demo Halloween storefront generator.
 Run:  python3 build.py
 Emits index.html plus the product artwork in assets/products/.
 
-Everything a client normally wants to change lives in PRODUCTS / CATEGORIES /
-REVIEWS below. Add a dict, re-run, done.
+The catalogue itself lives in catalog.py - 52 real products recovered from the
+links the client sent. Everything else a client normally wants to change lives
+in TRUST / FAQ below.
+
+Two things this generator will not do, both on purpose:
+
+  * It will not invent a price. A product with no price renders a "price to be
+    set" chip and a disabled buy button, so an unpriced page is obviously
+    unfinished rather than quietly wrong.
+  * It will not invent a star rating or a review count. Real products go in
+    front of real customers, and manufactured social proof on a live store is
+    not a placeholder, it is a lie. The rating block and the reviews section
+    hide themselves until there is something true to put in them.
 """
 
 import os
+import re
 import html
 
+import catalog
+
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def load_prices():
+    """Overlay prices.csv onto the catalogue.
+
+    The client fills two columns in one spreadsheet and re-runs the build; no
+    Python is edited to price 52 products. A blank cell leaves the product
+    unpriced rather than defaulting to zero - a $0.00 product looks like a
+    working price and is the worst possible failure here.
+    """
+    import csv
+    path = os.path.join(HERE, "prices.csv")
+    if not os.path.exists(path):
+        return 0
+    by_slug = {p["slug"]: p for p in catalog.PRODUCTS}
+    n = 0
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            p = by_slug.get((row.get("handle") or "").strip())
+            if not p:
+                continue
+            for key, col in (("price", "your_price"), ("was", "was_price")):
+                raw = (row.get(col) or "").strip().lstrip("$").replace(",", "")
+                if raw:
+                    try:
+                        p[key] = float(raw)
+                    except ValueError:
+                        print(f"  ! {p['slug']}: {col} is not a number: {raw!r}")
+            if p["price"] is not None:
+                n += 1
+    # A "was" price below the selling price would render a negative discount.
+    for p in catalog.PRODUCTS:
+        if p["price"] and p["was"] and p["was"] <= p["price"]:
+            print(f"  ! {p['slug']}: was_price {p['was']} is not above "
+                  f"your_price {p['price']} - discount badge suppressed")
+            p["was"] = None
+    return n
 ART_DIR = os.path.join(HERE, "assets", "products")
+
+# Set to False to remove the "selling fast, limited stock" bar from every
+# product page at once. It is an urgency claim, so it should only be on when
+# the client is comfortable standing behind it.
+SHOW_STOCK_BAR = True
 
 BRAND = "Hollow & Hex"
 TAGLINE = "Haunt Your House. Ship It Free."
@@ -304,165 +360,17 @@ ARTWORK = {
 # Catalogue
 # --------------------------------------------------------------------------
 
-PRODUCTS = [
-    dict(slug="animatronic-reaper", name="Life-Size Animatronic Reaper",
-         price=89.99, was=149.99, rating=4.8, reviews=412,
-         badge="Best Seller",
-         blurb="5ft 8in, motion-activated. Head turns, eyes light up, and it screams. The one the neighbours talk about."),
-    dict(slug="fog-machine", name="1000W Fog Machine + LED Lights",
-         price=49.99, was=79.99, rating=4.7, reviews=1284,
-         badge="Best Seller",
-         blurb="Fills a driveway in under a minute. Wireless remote, 12 colour LEDs, 1L tank."),
-    dict(slug="hanging-ghost", name="Motion-Sensor Hanging Ghost",
-         price=24.99, was=39.99, rating=4.6, reviews=903,
-         badge=None,
-         blurb="Drops, glows and shrieks when anyone walks under it. Hangs from any porch hook."),
-    dict(slug="pet-costume", name="Glow Skeleton Dog Costume",
-         price=18.99, was=29.99, rating=4.9, reviews=2107,
-         badge="Viral on TikTok",
-         blurb="Glow-in-the-dark ribcage, machine washable, sizes XS to XXL. Cats too."),
-    dict(slug="projector-lamp", name="Halloween Projector Lamp",
-         price=34.99, was=59.99, rating=4.5, reviews=658,
-         badge=None,
-         blurb="16 sliding scenes - bats, ghosts, spiders. Covers a whole house wall. Indoor or outdoor."),
-    dict(slug="window-clings", name="Bloody Handprint Clings (24pc)",
-         price=12.99, was=21.99, rating=4.4, reviews=531,
-         badge="Under $15",
-         blurb="Peel, stick, terrify. Leaves no residue and reuses year after year."),
-    dict(slug="pumpkin-lights", name="LED Pumpkin String Lights (30ft)",
-         price=19.99, was=32.99, rating=4.8, reviews=1749,
-         badge=None,
-         blurb="50 warm pumpkins, 8 lighting modes, USB or battery. Weatherproof."),
-    dict(slug="reaper-costume", name="Hooded Grim Reaper Costume",
-         price=44.99, was=74.99, rating=4.6, reviews=387,
-         badge=None,
-         blurb="Floor-length tattered robe, oversized hood, glowing eye insert included."),
-    dict(slug="inflatable-spider", name="8ft Inflatable Yard Spider",
-         price=59.99, was=99.99, rating=4.7, reviews=612,
-         badge="Low Stock",
-         blurb="Self-inflates in 40 seconds, lights from within, stakes and tethers included."),
-    dict(slug="witch-cauldron", name="Bubbling Witch's Cauldron",
-         price=29.99, was=49.99, rating=4.5, reviews=274,
-         badge=None,
-         blurb="Colour-changing mist bowl for the porch or the punch table. Just add water."),
-]
-
-# --------------------------------------------------------------------------
-# Per-product landing page content.
-#
-# Everything here is optional. A product with no DETAILS entry still gets a
-# complete landing page from the fallbacks in detail_for() - which matters,
-# because when the real product list arrives I want name + price + photo to be
-# enough to ship a page, and the rest to be an upgrade rather than a blocker.
-# --------------------------------------------------------------------------
-
-DETAILS = {
-
-"animatronic-reaper": dict(
-    hook="Your porch, but people cross the street to avoid it.",
-    bullets=[
-        "5ft 8in tall - reads as a person from the sidewalk, which is the whole trick",
-        "Motion sensor triggers at up to 15ft, adjustable down to 3ft",
-        "Head turns, arms raise, eyes glow red, and it screams",
-        "Three volume levels including silent, for the neighbours you like",
-    ],
-    features=[
-        ("It moves before they see it", "The sensor fires while they're still on the path, so the turn happens in their peripheral vision. That's what makes people jump - not the noise."),
-        ("Weatherproof where it counts", "Sealed motor housing and a covered battery bay. It sits out through rain and a Philadelphia October without complaint."),
-        ("Up in four minutes", "Two-piece pole into a weighted base, drape the robe, drop in 4 D-cells. No tools, no stakes, no assembly instructions you'll need to squint at."),
-    ],
-    specs=[("Height", "5ft 8in (173cm)"), ("Power", "4 x D battery or 5V adapter (both included)"),
-           ("Trigger", "PIR motion, 3-15ft adjustable"), ("Sound", "3 levels + silent, 88dB max"),
-           ("Material", "Polyester robe, ABS frame, latex skull"), ("Weather", "IPX4 - rain safe, not submersible")],
-    box=["Animatronic reaper", "Weighted base + 2-piece pole", "5V power adapter", "Scythe prop", "Quick-start card"],
-    reviews=[("Marisa T.", "Philadelphia, PA", 5, "Ordered Tuesday, had it Friday. My street has a group chat and it is entirely about my front yard now."),
-             ("Ken A.", "Toledo, OH", 5, "Set the sensor to 15ft and it catches people at the mailbox. Worth it for the video I got of my brother-in-law alone."),
-             ("Dana W.", "Sacramento, CA", 4, "Genuinely scary and easy to set up. Knocked one star because the scythe is lighter than it looks in photos.")],
-),
-
-"fog-machine": dict(
-    hook="One minute to a driveway nobody can see the end of.",
-    bullets=[
-        "1000W - fills a two-car driveway in under 60 seconds",
-        "12 colour LEDs wash the fog from underneath",
-        "Wireless remote plus a wired timer controller, both included",
-        "1 litre tank runs roughly 45 minutes of intermittent bursts",
-    ],
-    features=[
-        ("Low-lying fog, not a cloud", "The output is cooled on the way out so it hugs the ground instead of drifting up and vanishing. That's the look people are actually buying."),
-        ("Two ways to control it", "Wireless remote for manual bursts on the night, or the wired timer to set interval, duration and intensity and then forget about it."),
-        ("Water-based and non-staining", "Standard fog fluid, safe around kids and pets, leaves no residue on a porch or a car. Do not use oil-based fluid in it."),
-    ],
-    specs=[("Power", "1000W, 110V"), ("Tank", "1 litre"), ("Warm-up", "3-4 minutes from cold"),
-           ("Output", "Approx 8,000 cu ft/min"), ("LEDs", "12 x RGB, remote selectable"),
-           ("Controls", "Wireless remote + wired timer")],
-    box=["Fog machine", "Wireless remote", "Wired timer remote", "Hanging bracket", "250ml starter fluid"],
-    reviews=[("Devon R.", "Austin, TX", 5, "Genuinely too powerful for my porch and I could not be happier about that."),
-             ("Lucia M.", "Queens, NY", 5, "The LEDs are the part I didn't expect to care about. Green fog through a fence is unreal."),
-             ("Tom B.", "Denver, CO", 4, "Great machine. Buy a gallon of fluid with it, the starter bottle goes fast.")],
-),
-
-"pet-costume": dict(
-    hook="The reason your dog ends up on somebody's story.",
-    bullets=[
-        "Glow-in-the-dark ribcage - charges under any light, glows for hours",
-        "Machine washable, XS to XXL, cats included",
-        "Steps in and velcros - no over-the-head struggle",
-        "Leaves legs and tail completely free",
-    ],
-    features=[
-        ("It actually glows", "Phosphorescent print, not a light-grey print that photographs as glowing. Ten minutes under a lamp gets you a full evening."),
-        ("Sized off real measurements", "The chart is chest girth and back length, not S/M/L guesswork. Measure your dog once and the fit is right first time."),
-        ("Survives the wash", "Cold cycle, hang dry, and the print stays put. It's meant to come back out next October, not go in the bin on November 1st."),
-    ],
-    specs=[("Sizes", "XS, S, M, L, XL, XXL"), ("Fit", "Chest 11in - 34in"), ("Material", "Polyester / spandex blend"),
-           ("Glow", "Phosphorescent, approx 4hr after 10min charge"), ("Closure", "Velcro belly panel"),
-           ("Care", "Machine wash cold, hang dry")],
-    box=["Skeleton pet costume", "Size + measuring guide"],
-    reviews=[("Priya K.", "Chicago, IL", 5, "Arrived in two days, fits my beagle perfectly, and the glow is real glow not a printed-on gimmick."),
-             ("Erin S.", "Portland, OR", 5, "Bought XS for a cat fully expecting a disaster. She wore it for an hour. I have never been more surprised."),
-             ("Marcus D.", "Atlanta, GA", 5, "Third Halloween on the same costume, washed every year, still glows.")],
-),
-
-"inflatable-spider": dict(
-    hook="Eight feet of yard that your neighbours have to look at.",
-    bullets=[
-        "8ft across, self-inflates in about 40 seconds",
-        "Lights from inside - visible from down the block",
-        "Stakes and tethers included, holds in real wind",
-        "Deflates and folds into a bag the size of a pillow",
-    ],
-    features=[
-        ("Big enough to read from the road", "Most yard inflatables are 4-5ft and disappear from the sidewalk. Eight feet is the size where drivers slow down."),
-        ("Tied down properly", "Four ground stakes and three guy-line tethers, not the two flimsy pegs these usually ship with. It stays where you put it."),
-        ("Packs away small", "Fan pulls out, air pushes out, folds into the included bag. Stores on a shelf, not in half your garage."),
-    ],
-    specs=[("Size", "8ft wide x 5ft tall inflated"), ("Power", "Mains adapter, 30ft outdoor cord"),
-           ("Lighting", "4 internal LEDs, always-on"), ("Inflate", "Approx 40 seconds"),
-           ("Material", "Polyester, weather-treated"), ("Anchors", "4 stakes + 3 tethers")],
-    box=["Inflatable spider", "Internal fan + adapter", "4 ground stakes", "3 tethers", "Storage bag", "Patch kit"],
-    reviews=[("Ray H.", "Cherry Hill, NJ", 5, "Went up in five minutes and survived a genuinely windy week. The tethers are the difference."),
-             ("Nadia P.", "Tampa, FL", 5, "Kids on the block have named it. That's the review."),
-             ("Stephen L.", "Boise, ID", 4, "Bright, big, easy. The cord is long but you'll still probably want an extension.")],
-),
-}
+PRODUCTS = catalog.PRODUCTS
+CATEGORIES = catalog.CATEGORIES
+DETAILS = {}
 
 
-CATEGORIES = [
-    ("Animatronics", "The ones that move, scream and ruin trick-or-treaters", "animatronic-reaper"),
-    ("Yard & Decor", "Inflatables, tombstones, fog and lighting", "inflatable-spider"),
-    ("Costumes", "Adults, kids and everything in between", "reaper-costume"),
-    ("Pet Costumes", "The category that sells itself on video", "pet-costume"),
-]
-
-REVIEWS = [
-    ("Marisa T.", "Philadelphia, PA", 5,
-     "Ordered the reaper on a Tuesday, had it Friday. My street has a group chat and it is entirely about my front yard now."),
-    ("Devon R.", "Austin, TX", 5,
-     "The fog machine is genuinely too powerful for my porch and I could not be happier about that."),
-    ("Priya K.", "Chicago, IL", 5,
-     "Dog costume arrived in two days, fits my beagle perfectly, and the glow is real glow not a printed-on gimmick."),
-]
+REVIEWS = []
+# Empty on purpose. The demo carried three written-by-me testimonials, which
+# was fine when the products were invented too. These products are real and
+# will be sold to real people, so the reviews section stays hidden until there
+# are reviews. Connect a reviews app (Judge.me, Loox) on Shopify and it fills
+# itself from actual orders.
 
 TRUST = [
     ("Free US Shipping", "On every order, no minimum"),
@@ -477,9 +385,9 @@ FAQ = [
     ("How much is shipping?",
      "Nothing. Shipping is free on every order in the continental US, with no minimum spend. Alaska, Hawaii and Canada are a flat $7.95."),
     ("Can I return something?",
-     "Anything unopened can come back within 30 days for a full refund. If a item arrives damaged, send us a photo and we ship a replacement the same day - no return needed."),
-    ("Are the animatronics loud?",
-     "The reaper and the hanging ghost both have a three-level volume switch, including silent. Motion sensitivity is adjustable from 3ft to about 15ft."),
+     "Anything unopened can come back within 30 days for a full refund. If an item arrives damaged, send us a photo and we ship a replacement the same day - no return needed."),
+    ("Do the light-up items come with batteries?",
+     "The rechargeable pieces - the hero masks, the under-cabinet bars and the pumpkin night light - arrive charged with a USB-C cable in the box. The battery-powered decorations take standard AA or AAA cells, which are not included."),
     ("Do you ship outside the US?",
      "We ship to Canada, the UK, Ireland and Australia. Delivery runs 6-10 days, so international orders should go in before October 15th."),
 ]
@@ -502,8 +410,54 @@ def stars(rating):
     return "".join(out)
 
 
+def sentences(text, limit=4):
+    """Split prose into sentences for the fallback bullet list.
+
+    NOT text.split("."). A plain split tears decimals in half: the headrest
+    covers are "roughly 9.84 inches", which came out as two bullets reading
+    "Roughly 9" and "84 inches". This only splits on a full stop that is not
+    sitting between two digits.
+    """
+    parts = [s.strip() for s in re.split(r"(?<!\d)\.(?!\d)", text) if s.strip()]
+    return parts[:limit] or ["Ships free anywhere in the US"]
+
+
 def money(v):
-    return f"${v:,.2f}"
+    return f"${v:,.2f}" if v is not None else ""
+
+
+def img_for(p, i=0, base=""):
+    """Path to a product photo. Falls back to the drawn placeholder.
+
+    Exactly one product has no photograph - Walmart blocks automated requests
+    to its page. It gets the placeholder rather than a broken image, and the
+    placeholder says so in words, so nobody ships it by accident.
+    """
+    if not p["images"]:
+        return f"{base}assets/products/_no-photo.svg"
+    suffix = "" if i == 0 else f"-{i + 1}"
+    return f"{base}assets/products/{p['slug']}{suffix}.jpg"
+
+
+def price_html(p, cls=""):
+    """The price block, or a visible marker that no price has been set yet.
+
+    An empty gap where a price belongs reads as a bug. An orange "set your
+    price" chip reads as the one job left to do, which is what it is.
+    """
+    if p["price"] is None:
+        return f'<div class="{cls} noprice"><span class="tag-setprice">Price to be set</span></div>'
+    was = f'<span class="was">{money(p["was"])}</span>' if p.get("was") else ""
+    return f'<div class="{cls}"><span class="price">{money(p["price"])}</span>{was}</div>'
+
+
+def discount_chip(p):
+    """`floor`, not `round`. 49.99 against 79.99 is 37.5% off, and rounding it
+    up to 38 overstates the saving on a page built for paid traffic."""
+    if not p.get("price") or not p.get("was") or p["was"] <= p["price"]:
+        return ""
+    off = int((1 - p["price"] / p["was"]) * 100)
+    return f'<span class="card__off">-{off}%</span>'
 
 
 def product_card(p, base="", href=None):
@@ -512,26 +466,28 @@ def product_card(p, base="", href=None):
     The image and the title are links, the Add button is not - a button nested
     inside an anchor is both invalid and ambiguous to click.
     """
-    off = round((1 - p["price"] / p["was"]) * 100)
-    badge = f'<span class="badge">{html.escape(p["badge"])}</span>' if p["badge"] else ""
+    badge = f'<span class="badge">{html.escape(p["badge"])}</span>' if p.get("badge") else ""
     href = href if href is not None else f"p/{p['slug']}/"
     name = html.escape(p["name"])
+    if p["price"] is None:
+        add = ('<button class="btn btn--add" type="button" disabled '
+               'title="Set a price for this product first">Add to Cart</button>')
+    else:
+        add = (f'<button class="btn btn--add" type="button" data-add="{p["slug"]}" '
+               f'data-name="{html.escape(p["name"], quote=True)}" data-price="{p["price"]}">'
+               f'Add to Cart</button>')
     return f"""      <article class="card" data-slug="{p['slug']}">
         <a class="card__media" href="{href}">
           {badge}
-          <span class="card__off">-{off}%</span>
-          <img src="{base}assets/products/{p['slug']}.svg" alt="{name}" loading="lazy" width="600" height="600" />
+          {discount_chip(p)}
+          <img src="{img_for(p, 0, base)}" alt="{name}" loading="lazy" width="600" height="600" />
         </a>
         <div class="card__body">
-          <div class="card__rating">{stars(p['rating'])}<span class="card__rcount">{p['rating']} ({p['reviews']:,})</span></div>
           <h3 class="card__name"><a href="{href}">{name}</a></h3>
           <p class="card__blurb">{html.escape(p['blurb'])}</p>
           <div class="card__foot">
-            <div class="card__price"><span class="price">{money(p['price'])}</span><span class="was">{money(p['was'])}</span></div>
-            <button class="btn btn--add" type="button"
-                    data-add="{p['slug']}" data-name="{html.escape(p['name'], quote=True)}" data-price="{p['price']}">
-              Add to Cart
-            </button>
+            {price_html(p, "card__price")}
+            {add}
           </div>
         </div>
       </article>
@@ -539,8 +495,14 @@ def product_card(p, base="", href=None):
 
 
 def category_card(title, sub, slug):
+    """`slug` names the product whose photo fronts this category tile.
+
+    catalog.check() asserts every one of those slugs exists, so a renamed
+    product breaks the build rather than silently emptying a tile.
+    """
+    front = [x for x in PRODUCTS if x["slug"] == slug][0]
     return f"""      <a class="cat" href="#shop">
-        <img src="assets/products/{slug}.svg" alt="" aria-hidden="true" loading="lazy" width="600" height="600" />
+        <img src="{img_for(front)}" alt="" aria-hidden="true" loading="lazy" width="600" height="600" />
         <div class="cat__txt"><h3>{html.escape(title)}</h3><p>{html.escape(sub)}</p></div>
       </a>
 """
@@ -581,8 +543,10 @@ LOGO = """<svg class="logo__mark" viewBox="0 0 64 64" aria-hidden="true">
 # `base` prefixes asset paths, `home` prefixes in-page anchors.
 # --------------------------------------------------------------------------
 
+# No "Reviews" entry: the reviews section hides itself while REVIEWS is empty,
+# and a nav link that scrolls nowhere is worse than one less link.
 NAV = [("shop", "Shop All"), ("cats", "Categories"), ("why", "Why Us"),
-       ("reviews", "Reviews"), ("faq", "FAQ")]
+       ("faq", "FAQ")]
 
 
 def announce_html():
@@ -616,11 +580,11 @@ def footer_html(base, home):
   <div class="wrap ftr__in">
     <div class="ftr__brand">
       <a class="logo" href="{home or '#top'}">{LOGO}<span class="logo__txt">Hollow<em>&amp;</em>Hex</span></a>
-      <p>Animatronics, fog and yard decor, shipped free across the US and guaranteed before October 31st.</p>
+      <p>Light-up masks, floating candles, yard ghosts and decor, shipped free across the US and guaranteed before October 31st.</p>
     </div>
-    <div class="ftr__col"><h4>Shop</h4><a href="{home}#shop">Best Sellers</a><a href="{home}#cats">Animatronics</a><a href="{home}#cats">Yard &amp; Decor</a><a href="{home}#cats">Costumes</a><a href="{home}#cats">Pet Costumes</a></div>
+    <div class="ftr__col"><h4>Shop</h4><a href="{home}#shop">Best Sellers</a><a href="{home}#cats">LED Masks</a><a href="{home}#cats">Lights &amp; Candles</a><a href="{home}#cats">Yard &amp; Outdoor</a><a href="{home}#cats">Apparel</a></div>
     <div class="ftr__col"><h4>Help</h4><a href="{home}#faq">Shipping</a><a href="{home}#faq">Returns</a><a href="{home}#faq">Track My Order</a><a href="{home}#faq">Contact</a></div>
-    <div class="ftr__col"><h4>Company</h4><a href="{home}#why">About</a><a href="{home}#reviews">Reviews</a><a href="{home}#faq">Privacy</a><a href="{home}#faq">Terms</a></div>
+    <div class="ftr__col"><h4>Company</h4><a href="{home}#why">About</a><a href="{home}#shop">Shop All</a><a href="{home}#faq">Privacy</a><a href="{home}#faq">Terms</a></div>
   </div>
   <div class="wrap ftr__base">
     <p>&copy; 2026 {BRAND}. Demo storefront built for review &mdash; not a live shop.</p>
@@ -658,14 +622,13 @@ def cart_html():
 def detail_for(p):
     """Landing page content for a product, with a full set of fallbacks.
 
-    A product that has no DETAILS entry still produces a complete page. This is
-    deliberate: when the real product list lands, name + price + photo has to be
-    enough to ship, with the written detail an upgrade rather than a blocker.
+    A product with nothing but a name, a photo and a one-line blurb still
+    produces a complete page. That is the whole design: written detail is an
+    upgrade, never the thing that blocks a launch.
     """
     d = dict(DETAILS.get(p["slug"], {}))
     d.setdefault("hook", p["blurb"])
-    d.setdefault("bullets", [s.strip() for s in p["blurb"].split(".") if s.strip()][:4] or
-                            ["Ships free anywhere in the US"])
+    d.setdefault("bullets", catalog.BULLETS.get(p["slug"]) or sentences(p["blurb"]))
     d.setdefault("features", [
         ("Ships free, ships fast", "Out of a US warehouse within 24 hours of your order, tracked the whole way. No six-week wait from overseas."),
         ("Guaranteed before Halloween", "Order by October 20th and it is on your doorstep by the 30th, or you do not pay for it."),
@@ -680,19 +643,28 @@ def detail_for(p):
 
 def landing_page(p, others):
     d = detail_for(p)
-    off = round((1 - p["price"] / p["was"]) * 100)
-    save = p["was"] - p["price"]
     base = "../../"
     home = "../../index.html"
-    img = f"{base}assets/products/{p['slug']}"
+    main_img = img_for(p, 0, base)
     esc = html.escape
 
-    thumbs = "".join(
-        f'''        <button class="pdp__thumb{' on' if i == 0 else ''}" type="button" data-view="{img}{suf}.svg" aria-label="View {i + 1}">
-          <img src="{img}{suf}.svg" alt="" width="600" height="600" loading="lazy" />
+    save = (f'''<span class="pdp__save">You save {money(p["was"] - p["price"])}</span>'''
+            if p["price"] is not None and p.get("was") else "")
+
+    # Supplier listings ship one catalogue photo, so most products have a single
+    # image and the thumbnail strip would be a row of one. Hide it rather than
+    # render a control that does nothing.
+    if len(p["images"]) > 1:
+        thumbs = '''      <div class="pdp__thumbs">
+''' + "".join(
+            f'''        <button class="pdp__thumb{" on" if i == 0 else ""}" type="button" data-view="{img_for(p, i, base)}" aria-label="View {i + 1}">
+          <img src="{img_for(p, i, base)}" alt="" width="600" height="600" loading="lazy" />
         </button>
 '''
-        for i, (suf, _) in enumerate(VIEWS))
+            for i in range(len(p["images"]))) + "      </div>\n"
+    else:
+        thumbs = ""
+
 
     bullets = "".join(f"        <li>{esc(b)}</li>\n" for b in d["bullets"])
 
@@ -707,9 +679,63 @@ def landing_page(p, others):
 
     box = "".join(f"          <li>{esc(b)}</li>\n" for b in d["box"])
 
-    revs = "".join(review_card(*r) for r in d["reviews"])
-
     rel = "".join(product_card(o, base=base, href=f"../{o['slug']}/") for o in others)
+
+    # Every block below hides itself rather than showing an invented value.
+    # A star rating needs a review source; a price needs the client's margin
+    # decision. Neither is something this script is entitled to make up.
+    if p.get("rating"):
+        rating_html = (f'      <div class="pdp__rate">{stars(p["rating"])}'
+                       f'<span class="pdp__rc">{p["rating"]} &middot; '
+                       f'{p["reviews"]:,} reviews</span></div>\n')
+    else:
+        rating_html = ""
+
+    price_block = price_html(p, "pdp__price").replace(
+        "</div>", f"{save}</div>") if save else price_html(p, "pdp__price")
+
+    if p["price"] is None:
+        buy_button = ('<button class="btn btn--gold btn--wide" type="button" disabled>'
+                      'Price not set yet</button>')
+        stick_button = ('<button class="btn btn--gold" type="button" disabled>'
+                        'Add</button>')
+        stick_price = '<b class="tag-setprice">Price to be set</b>'
+    else:
+        buy_button = (f'<button class="btn btn--gold btn--wide btn--add" type="button"\n'
+                      f'                data-add="{p["slug"]}" '
+                      f'data-name="{esc(p["name"], quote=True)}" '
+                      f'data-price="{p["price"]}" data-qty="qty">\n'
+                      f'          Add to Cart &mdash; {money(p["price"])}\n'
+                      f'        </button>')
+        stick_button = (f'<button class="btn btn--gold btn--add" type="button"\n'
+                        f'          data-add="{p["slug"]}" '
+                        f'data-name="{esc(p["name"], quote=True)}" '
+                        f'data-price="{p["price"]}">\n    Add\n  </button>')
+        was_s = f' <s>{money(p["was"])}</s>' if p.get("was") else ""
+        stick_price = f'<b>{money(p["price"])}</b>{was_s}'
+
+    # "limited stock left at this price" cannot be shown on a product with no
+    # price, and it is a claim about stock levels nobody has checked. It only
+    # renders once a price exists, and the client can switch it off entirely.
+    stock_bar = ("""      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
+""" if p["price"] is not None and SHOW_STOCK_BAR else "")
+
+    if d["reviews"]:
+        revs_html = "".join(review_card(*r) for r in d["reviews"])
+        reviews_section = f"""<!-- reviews -->
+<section class="sec sec--alt" id="reviews">
+  <div class="wrap">
+    <h2 class="sec__h">What buyers say</h2>
+    <div class="revs">
+{revs_html}    </div>
+  </div>
+</section>
+"""
+    else:
+        reviews_section = ""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -717,9 +743,9 @@ def landing_page(p, others):
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{esc(p['name'])} &mdash; {BRAND}</title>
-<meta name="description" content="{esc(d['hook'])} {money(p['price'])} with free US shipping, guaranteed on your doorstep before October 31st." />
+<meta name="description" content="{esc(d['hook'])} Free US shipping, guaranteed on your doorstep before October 31st." />
 <meta name="robots" content="noindex" />
-<meta property="og:title" content="{esc(p['name'])} &mdash; {money(p['price'])}" />
+<meta property="og:title" content="{esc(p['name'])}" />
 <meta property="og:description" content="{esc(d['hook'])}" />
 <meta property="og:type" content="product" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -740,43 +766,30 @@ def landing_page(p, others):
 
     <div class="pdp__gal">
       <div class="pdp__stage">
-        <span class="pdp__off">-{off}%</span>
-        <img id="pdpimg" src="{img}.svg" alt="{esc(p['name'])}" width="600" height="600" />
+        {discount_chip(p).replace('card__off', 'pdp__off')}
+        <img id="pdpimg" src="{main_img}" alt="{esc(p['name'])}" width="600" height="600" />
       </div>
-      <div class="pdp__thumbs">
-{thumbs}      </div>
+{thumbs}
     </div>
 
     <div class="pdp__buy">
       <p class="pdp__crumb"><a href="{home}#shop">Shop</a> <span>/</span> {esc(p['name'])}</p>
       <h1 class="pdp__h">{esc(p['name'])}</h1>
-      <div class="pdp__rate">{stars(p['rating'])}<span class="pdp__rc">{p['rating']} &middot; {p['reviews']:,} reviews</span></div>
-      <p class="pdp__hook">{esc(d['hook'])}</p>
+{rating_html}      <p class="pdp__hook">{esc(d['hook'])}</p>
 
-      <div class="pdp__price">
-        <span class="price">{money(p['price'])}</span>
-        <span class="was">{money(p['was'])}</span>
-        <span class="pdp__save">You save {money(save)}</span>
-      </div>
+      {price_block}
 
       <ul class="pdp__bul">
 {bullets}      </ul>
 
-      <div class="pdp__stock">
-        <div class="pdp__bar"><i style="width:22%"></i></div>
-        <p>Selling fast &mdash; limited stock left at this price</p>
-      </div>
-
+{stock_bar}
       <div class="pdp__act">
         <div class="qty" id="qty">
           <button type="button" data-q="-1" aria-label="Decrease quantity">&minus;</button>
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide btn--add" type="button"
-                data-add="{p['slug']}" data-name="{esc(p['name'], quote=True)}" data-price="{p['price']}" data-qty="qty">
-          Add to Cart &mdash; {money(p['price'])}
-        </button>
+        {buy_button}
       </div>
 
       <ul class="pdp__trust">
@@ -814,21 +827,12 @@ def landing_page(p, others):
       <h2 class="sec__h">In the box</h2>
       <ul class="ticks">
 {box}      </ul>
-      <img class="spec__art" src="{img}-detail.svg" alt="" aria-hidden="true" width="600" height="600" />
+      <img class="spec__art" src="{img_for(p, len(p['images']) - 1 if p['images'] else 0, base)}" alt="" aria-hidden="true" width="600" height="600" />
     </div>
   </div>
 </section>
 
-<!-- reviews -->
-<section class="sec sec--alt" id="reviews">
-  <div class="wrap">
-    <p class="sec__k">{p['rating']} average from {p['reviews']:,} orders</p>
-    <h2 class="sec__h">What buyers say</h2>
-    <div class="revs">
-{revs}    </div>
-  </div>
-</section>
-
+{reviews_section}
 <!-- faq -->
 <section class="sec" id="faq">
   <div class="wrap wrap--narrow">
@@ -856,15 +860,12 @@ def landing_page(p, others):
 
 <!-- sticky mobile buy bar -->
 <div class="stick" id="stick" aria-hidden="true">
-  <img src="{img}.svg" alt="" width="600" height="600" />
+  <img src="{main_img}" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>{esc(p['name'])}</p>
-    <span><b>{money(p['price'])}</b> <s>{money(p['was'])}</s></span>
+    <span>{stick_price}</span>
   </div>
-  <button class="btn btn--gold btn--add" type="button"
-          data-add="{p['slug']}" data-name="{esc(p['name'], quote=True)}" data-price="{p['price']}">
-    Add
-  </button>
+  {stick_button}
 </div>
 
 <script src="{base}script.js"></script>
@@ -873,14 +874,45 @@ def landing_page(p, others):
 """
 
 
+NO_PHOTO = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Photo not available yet">
+<rect width="600" height="600" fill="#15111f"/>
+<rect x="24" y="24" width="552" height="552" rx="18" fill="none" stroke="{ORANGE}" stroke-width="3" stroke-dasharray="14 12" opacity=".5"/>
+<g transform="translate(300 250)" fill="none" stroke="{ORANGE}" stroke-width="9" stroke-linejoin="round" opacity=".75">
+<rect x="-92" y="-64" width="184" height="140" rx="12"/>
+<path d="M-92 44 -30-16 8 22 44-10l48 44"/>
+<circle cx="46" cy="-30" r="15"/>
+</g>
+<text x="300" y="404" text-anchor="middle" font-family="Inter,Segoe UI,sans-serif" font-size="30" font-weight="700" fill="{BONE}" opacity=".85">Photo needed</text>
+<text x="300" y="446" text-anchor="middle" font-family="Inter,Segoe UI,sans-serif" font-size="21" fill="{BONE}" opacity=".55">Supplier blocked the page</text>
+</svg>
+"""
+
+
 def build():
     os.makedirs(ART_DIR, exist_ok=True)
-    n_art = 0
-    for slug, (label, glow, body) in ARTWORK.items():
-        for suffix, render in VIEWS:
-            with open(os.path.join(ART_DIR, f"{slug}{suffix}.svg"), "w", encoding="utf-8") as f:
-                f.write(render(label, glow, body))
-            n_art += 1
+    priced = load_prices()
+    if priced:
+        print(f"prices.csv: {priced} products priced")
+
+    if REVIEWS:
+        home_reviews = """<!-- reviews -->
+<section class="sec sec--alt" id="reviews">
+  <div class="wrap">
+    <h2 class="sec__h">What Buyers Say</h2>
+    <div class="revs">
+""" + "".join(review_card(*r) for r in REVIEWS) + """    </div>
+  </div>
+</section>
+"""
+    else:
+        home_reviews = ""
+
+    # The demo's hand-drawn SVGs went with the demo's invented products. The
+    # only artwork still needed is the placeholder for the one product whose
+    # supplier page blocks automated requests.
+    with open(os.path.join(ART_DIR, "_no-photo.svg"), "w", encoding="utf-8") as f:
+        f.write(NO_PHOTO)
+    n_art = 1
 
     page = f"""<!DOCTYPE html>
 <html lang="en">
@@ -888,7 +920,7 @@ def build():
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{BRAND} &mdash; {TAGLINE}</title>
-<meta name="description" content="Animatronics, fog, yard decor and costumes shipped free across the US and guaranteed to land before October 31st." />
+<meta name="description" content="Light-up masks, floating candles, yard ghosts, decor and apparel shipped free across the US and guaranteed to land before October 31st." />
 <meta name="robots" content="noindex" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -905,7 +937,7 @@ def build():
   <div class="wrap hero__in">
     <p class="hero__k">Halloween 2026 Collection</p>
     <h1 class="hero__h">Haunt Your House.<br /><span>Ship It Free.</span></h1>
-    <p class="hero__p">Animatronics, fog, yard giants and costumes &mdash; shipped free anywhere in the US and guaranteed on your doorstep before October 31st.</p>
+    <p class="hero__p">Light-up masks, floating candles, yard ghosts and decor &mdash; shipped free anywhere in the US and guaranteed on your doorstep before October 31st.</p>
     <div class="hero__cta">
       <a class="btn btn--gold" href="#shop">Shop the Collection</a>
       <a class="btn btn--ghost" href="#cats">Browse Categories</a>
@@ -942,7 +974,7 @@ def build():
   <div class="wrap">
     <p class="sec__k">Selling fast</p>
     <h2 class="sec__h">This Season's Best Sellers</h2>
-    <p class="sec__sub">Every item ships free and is in stock right now. Prices hold until October 31st.</p>
+    <p class="sec__sub">Every item ships free and is in stock right now, and guaranteed to land before October 31st.</p>
     <div class="grid">
 {"".join(product_card(p) for p in PRODUCTS)}    </div>
   </div>
@@ -964,21 +996,12 @@ def build():
       <a class="btn btn--gold" href="#shop">Start Shopping</a>
     </div>
     <div class="why__art">
-      <img src="assets/products/witch-cauldron.svg" alt="" aria-hidden="true" width="600" height="600" />
+      <img src="{img_for([x for x in PRODUCTS if x['slug'] == 'tripod-cauldron-fog'][0])}" alt="" aria-hidden="true" width="600" height="600" />
     </div>
   </div>
 </section>
 
-<!-- reviews -->
-<section class="sec sec--alt" id="reviews">
-  <div class="wrap">
-    <p class="sec__k">4.8 average from 8,900+ orders</p>
-    <h2 class="sec__h">What Buyers Say</h2>
-    <div class="revs">
-{"".join(review_card(*r) for r in REVIEWS)}    </div>
-  </div>
-</section>
-
+{home_reviews}
 <!-- email capture -->
 <section class="cap">
   <div class="wrap cap__in">
@@ -1028,8 +1051,10 @@ def build():
 
     print(f"index.html written ({len(page):,} bytes)")
     print(f"{len(PRODUCTS)} landing pages written to p/<slug>/index.html ({total:,} bytes)")
-    print(f"{n_art} product SVGs written to assets/products/ "
-          f"({len(ARTWORK)} products x {len(VIEWS)} views)")
+    print(f"{n_art} placeholder SVG written to assets/products/")
+    photos = sum(len(p["images"]) for p in PRODUCTS)
+    print(f"{len(PRODUCTS)} products, {photos} supplier photos, "
+          f"{sum(1 for p in PRODUCTS if p['price'] is None)} still need a price")
 
 
 if __name__ == "__main__":

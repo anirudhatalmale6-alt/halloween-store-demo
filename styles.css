@@ -182,7 +182,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .sec__sub{text-align:center;color:var(--muted);max-width:620px;margin:1rem auto 0}
 
 /* ---------- categories ---------- */
-.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:2.8rem}
+/* 3 across, not 4. There are six categories: a 4-wide grid put four on the
+   first row and left two stranded beside a half-page of empty space. Six
+   divides by three. */
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:2.8rem}
 .cat{
   position:relative;border-radius:var(--radius);overflow:hidden;
   background:linear-gradient(170deg,var(--panel2),var(--panel));
@@ -588,3 +591,57 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
   .rv{opacity:1;transform:none}
 }
+
+/* --------------------------------------------------------------------------
+   Unpriced products.
+
+   Every product the client sent arrived without a price - TikTok Shop puts
+   the number behind a captcha, and the selling price is his margin decision
+   anyway. Rather than invent one, the price slot carries a visible marker.
+
+   Deliberately loud. A blank space where a price belongs reads as a broken
+   page; this reads as the one job left to do, which is what it is.
+   -------------------------------------------------------------------------- */
+.tag-setprice{
+  display:inline-block;
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:#120d05;
+  background:linear-gradient(180deg,#ffb75e,#ff8a1f);
+  padding:.34rem .6rem;
+  border-radius:6px;
+  white-space:nowrap;
+}
+.pdp__price .tag-setprice{font-size:.85rem;padding:.5rem .85rem}
+.stick__m .tag-setprice{font-size:.62rem;padding:.22rem .42rem}
+
+/* A disabled buy button must not look clickable. Without this it keeps the
+   gold gradient and reads as live. */
+.btn[disabled]{
+  opacity:.42;
+  cursor:not-allowed;
+  filter:grayscale(.7);
+}
+
+/* Supplier photos are real photographs on white or in-situ backgrounds, not
+   the drawn SVGs the demo used. They need a light plate behind them or a
+   white-background product sits in a bright square on a near-black page. */
+.card__media,.pdp__stage{background:#f7f4ef}
+.card__media img,.pdp__stage img{mix-blend-mode:normal}
+
+/* One product has no photograph at all, so its placeholder is the dark SVG.
+   Give that one back the dark plate rather than framing it in white. */
+.card__media:has(img[src$="_no-photo.svg"]),
+.pdp__stage:has(img[src$="_no-photo.svg"]){background:#15111f}
+
+/* Supplier photos arrive in whatever shape the supplier shot them: 800x800 for
+   most, but also 600x800, 800x711 and the 506x900 SplatMat shots. Anywhere the
+   layout fixes a square slot, that has to be handled explicitly or a tall photo
+   is squashed into it - measured at 506x900 natural rendering as 163x163.
+   `contain` keeps the whole product visible, which matters on a thumbnail
+   whose only job is to identify which view it is. */
+.pdp__thumb img,
+.stick img{object-fit:contain;width:100%;height:100%}
+.pdp__thumb,.stick img{background:#f7f4ef}
