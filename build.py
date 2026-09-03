@@ -556,11 +556,21 @@ def img_for(p, i=0, base=""):
     Every one of the 52 has a real photograph now. The placeholder is kept
     because it is the right answer for a product added later with no image
     yet - it says so in words, so nobody ships it by accident.
+
+    The filename comes OUT of the list, it is not computed from the index.
+    Deriving `slug-3.jpg` from position 3 was fine while the positions were
+    always 1..n with no holes; the moment the client deletes one row out of the
+    middle of photos.csv the positions go 1,2,4,5 and every derived name after
+    the hole points at a file that is not there. Entries that are still a bare
+    product id - a product photos.csv says nothing about - keep the old rule.
     """
     if not p["images"]:
         return f"{base}assets/products/_no-photo.svg"
-    suffix = "" if i == 0 else f"-{i + 1}"
-    return f"{base}assets/products/{p['slug']}{suffix}.jpg"
+    i = max(0, min(i, len(p["images"]) - 1))
+    name = str(p["images"][i])
+    if not name.lower().endswith((".jpg", ".jpeg", ".png", ".webp", ".svg")):
+        name = f"{p['slug']}.jpg" if i == 0 else f"{p['slug']}-{i + 1}.jpg"
+    return f"{base}assets/products/{name}"
 
 
 def price_html(p, cls=""):
@@ -624,11 +634,19 @@ def product_card(p, base="", href=None):
     # is only there for the products the supplier publishes a figure for.
     sold = (f'<p class="card__sold">{p["sold"]:,}+ sold</p>'
             if p.get("sold") else "")
+    # Second photo on hover. It is a data- attribute rather than a second <img>
+    # on purpose: 52 cards x one extra photograph is 52 extra downloads on the
+    # homepage, and the brief asks for the site to be FAST on mobile - where
+    # there is no hover at all and the second photo would never be seen. The
+    # script swaps the src the first time a pointer enters the card, so a phone
+    # pays nothing for it.
+    hover = (f' data-alt="{img_for(p, 1, base)}"'
+             if len(p["images"]) > 1 else "")
     return f"""      <article class="card" data-slug="{p['slug']}">
         <a class="card__media" href="{href}">
           {badge}
           {discount_chip(p)}
-          <img src="{img_for(p, 0, base)}" alt="{name}" loading="lazy" width="600" height="600" />
+          <img src="{img_for(p, 0, base)}" alt="{name}" loading="lazy" width="600" height="600"{hover} />
         </a>
         <div class="card__body">
           {rating_row(p)}
@@ -682,7 +700,7 @@ def cat_chips(home=""):
 """
 
 
-def review_card(r, product_name=None):
+def review_card(r, product_name=None, base=""):
     """One review. `r` is a row out of reviews.csv.
 
     The `photo` column is empty in every row today - the supplier's review
@@ -702,8 +720,16 @@ def review_card(r, product_name=None):
            if r.get("verified") else "")
     of = (f'<span class="rev__of">on {html.escape(product_name)}</span>'
           if product_name else "")
-    photo = (f'<img class="rev__img" src="{html.escape(r["photo"], quote=True)}" '
-             f'alt="" loading="lazy" />' if r.get("photo") else "")
+    # The photo column holds a FILENAME in assets/reviews/, because a bare
+    # filename is the same on the homepage and on a landing page two folders
+    # down and a relative path is not. Anything that is already a URL or an
+    # absolute path is passed through untouched, so the client can point a row
+    # at an image hosted anywhere without learning this rule.
+    src = (r.get("photo") or "").strip()
+    if src and "://" not in src and not src.startswith("/"):
+        src = f"{base}assets/reviews/{src}"
+    photo = (f'<img class="rev__img" src="{html.escape(src, quote=True)}" '
+             f'alt="" loading="lazy" width="600" height="600" />' if src else "")
     title = (f'<strong class="rev__t">{html.escape(r["title"])}</strong>'
              if r.get("title") else "")
     return f"""      <figure class="rev">
@@ -876,9 +902,11 @@ def landing_page(p, others):
     save = (f'''<span class="pdp__save">You save {money(p["was"] - p["price"])}</span>'''
             if p["price"] is not None and p.get("was") else "")
 
-    # Supplier listings ship one catalogue photo, so most products have a single
-    # image and the thumbnail strip would be a row of one. Hide it rather than
-    # render a control that does nothing.
+    # Most products now carry the supplier's whole gallery - five to eight
+    # photos. A handful still have one (the two Walmart-sourced items, and one
+    # product whose page the supplier will not serve from here), and for those
+    # the strip would be a row of one: hide it rather than render a control
+    # that does nothing.
     if len(p["images"]) > 1:
         thumbs = '''      <div class="pdp__thumbs">
 ''' + "".join(
@@ -980,7 +1008,7 @@ def landing_page(p, others):
         # reviews.csv and every one of them is on the page - this only decides
         # the order, which is a display choice, not a filter.
         ordered = sorted(d["reviews"], key=lambda r: -r["rating"])
-        revs_html = "".join(review_card(r) for r in ordered)
+        revs_html = "".join(review_card(r, base=base) for r in ordered)
         avg = p.get("rating")
         summary = (f'<p class="revs__sum">{stars(avg)} <b>{avg:.1f}</b> out of 5 '
                    f'from {p["reviews"]:,} reviews</p>'

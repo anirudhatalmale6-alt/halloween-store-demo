@@ -299,6 +299,33 @@
     });
   });
 
+  /* ---------------------------------------------------------
+     Grid cards: show the product's SECOND photo on hover.
+
+     The second src is only fetched the first time a pointer actually enters
+     the card, so the homepage still loads 52 photographs, not 104. A phone
+     never fires pointerenter without a tap, and a tap follows the link, so
+     mobile pays nothing for this - which is the point, the brief asks for the
+     site to be fast on a phone.
+
+     Guarded on hover:hover so a stylus or a hybrid laptop doesn't get a photo
+     swapped under a finger that was about to tap it.
+     --------------------------------------------------------- */
+  var canHover = window.matchMedia && window.matchMedia('(hover:hover)').matches;
+  if (canHover) {
+    $$('.card__media img[data-alt]').forEach(function (img) {
+      var card = img.closest('.card__media') || img.parentNode;
+      var first = img.getAttribute('src');
+      var alt = img.getAttribute('data-alt');
+      var pre = null;
+      card.addEventListener('pointerenter', function () {
+        if (!pre) { pre = new Image(); pre.src = alt; }
+        img.src = alt;
+      });
+      card.addEventListener('pointerleave', function () { img.src = first; });
+    });
+  }
+
   var qtyBox = $('#qty');
   var qtyN = $('#qtyn');
   on(qtyBox, 'click', function (e) {

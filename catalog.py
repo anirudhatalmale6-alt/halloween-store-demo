@@ -560,6 +560,61 @@ UNAVAILABLE = {
 }
 
 
+# --------------------------------------------------------------------------
+# The photo gallery, from photos.csv.
+#
+# `images` above holds ONE entry per product - the catalogue shot that came
+# back in the short link's first redirect hop, because that is all a redirect
+# hop carries. The rest of each supplier gallery was pulled out of the product
+# pages afterwards by make_photos.py, which downloads them, drops the frames
+# that are the same picture again, and writes photos.csv.
+#
+# The CSV is applied here rather than in build.py so that everything reading
+# this module - the site build, the Shopify product CSV, the audit - sees the
+# same gallery. One product's photos cannot be right on the site and wrong in
+# the import file.
+#
+# The file is the client's to edit: delete a row and that photo stops being
+# used everywhere. Position 1 is the main image; the rest follow in order.
+# Nothing here invents a file - a row whose jpg is missing from disk is
+# dropped, with a warning, rather than rendering as a broken image.
+def _apply_photos():
+    import csv as _csv
+    import os as _os
+    here = _os.path.dirname(_os.path.abspath(__file__))
+    path = _os.path.join(here, "photos.csv")
+    if not _os.path.exists(path):
+        return 0
+    by_slug = {}
+    with open(path, encoding="utf-8") as fh:
+        for row in _csv.DictReader(fh):
+            f = (row.get("file") or "").strip()
+            if not f:
+                continue
+            if not _os.path.exists(_os.path.join(here, "assets", "products", f)):
+                print(f"  ! photos.csv: {row['handle']} lists {f}, "
+                      f"which is not in assets/products - ignored")
+                continue
+            by_slug.setdefault(row["handle"], []).append(
+                (int(row["position"]), f))
+    n = 0
+    for prod in PRODUCTS:
+        got = by_slug.get(prod["slug"])
+        if not got:
+            continue
+        got.sort()
+        # img_for() derives the filename from the index (slug.jpg, slug-2.jpg,
+        # ...), so what it needs from this list is its LENGTH. The entries are
+        # kept as the filenames anyway - a list of filenames is inspectable and
+        # a list of the same pid repeated is not.
+        prod["images"] = [f for _, f in got]
+        n += len(got)
+    return n
+
+
+PHOTO_COUNT = _apply_photos()
+
+
 def check():
     """Fail loudly on a duplicate slug or a product with no name."""
     seen = set()

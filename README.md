@@ -24,6 +24,9 @@ links you sent.
 | | |
 |---|---|
 | Products with a real photo | **52 of 52** |
+| Supplier photographs in total | **287** |
+| Products with the full supplier gallery | **34** (5–8 photos each) |
+| Real customer photos in the reviews | **68** |
 | Products with a verified price | **22** |
 | Products the supplier no longer lists | **15** |
 | Products that still need a price from you | **15** |
@@ -33,6 +36,20 @@ links you sent.
 Every product has its supplier's own photographs. Nothing is a placeholder.
 
 ### What changed in this round
+
+- **Every landing page now carries the whole supplier gallery**, not one photo.
+  Five to eight images on 34 of the 52, as a thumbnail strip under the main
+  image — see [The photos](#the-photos) below for where they came from, what
+  is still missing and what you should look at before going live.
+- **68 of the 126 reviews now show the buyer's own photograph**, downloaded
+  from the supplier's listing rather than hot-linked, so they will not go dark.
+  The reviews section says in a line underneath that these are the supplier
+  listing's reviews and photos, not your store's.
+- Grid cards show the product's second photo when you hover them. The second
+  image is only fetched on the first hover, so a phone — where there is no
+  hover — downloads nothing extra for it.
+
+### What changed in the round before that
 
 - The homepage now has **a section per category** with its own heading and
   count. The category tiles and the sticky jump bar under the header both
@@ -114,6 +131,59 @@ that is not a number prints a warning and leaves the product unpriced.
 **One price needs your judgement rather than a copy.** Walmart sells the scary
 face headrest covers for $1.99. Free US shipping cannot come out of $1.99, so
 that one needs a real markup or it costs you money on every order.
+
+---
+
+## The photos
+
+`photos.csv` — one row per photograph, in the order they appear:
+
+    handle,position,file,source
+
+Position 1 is the main image; the rest become the thumbnail strip. **Delete a
+row and that photo disappears everywhere** — the site, the thumbnails, and the
+Shopify import file, because all three read this one file. `source` is the URL
+it came from, kept so any picture can be traced back.
+
+**287 photographs across the 52 products.** Where they came from: the link you
+sent me for each product is a short link, and following it gives back the
+product's title and *one* catalogue photo before TikTok's region check cuts the
+request off. That one photo is what the site had. The rest of each gallery is
+inside the product page itself, which needed fetching separately — 34 products
+answered, with five to eight photos each.
+
+Everything is **downloaded and served from this site**. The supplier's own
+image URLs carry expiring signatures, so linking to them directly would have
+left you with a shop full of broken pictures within days.
+
+### Three things to look at before you go live
+
+- **Some frames are marketing graphics, not photographs.** Comparison charts
+  ("ours" vs "theirs"), "what's in the kit" diagrams, installation steps. A
+  comparison chart is a claim *your* shop is making about a competitor, so
+  decide on those deliberately. One row out of `photos.csv` removes one.
+- **A few carry the supplier's own brand text** burnt into the image.
+- **Eighteen products did not get a gallery.** Fifteen are the ones the
+  supplier no longer lists. Two are the Walmart items, which have four photos
+  each already. The last is the white hero mask with the remote — its page
+  will not load from outside the US however I ask for it, and I would rather
+  tell you that than pad it out. On your phone, save the extra photos from
+  that listing and drop them into `assets/products/` as
+  `white-hero-mask-remote-2.jpg`, `-3.jpg`, and add the rows to `photos.csv`.
+
+Thirty-eight frames were dropped automatically because they were a picture the
+product already had — the supplier serves the same photograph under several
+URLs and at several crops, and a gallery showing one picture three times is
+worse than a gallery of one.
+
+### Customer photos
+
+**68 of the 126 reviews now carry the buyer's own photograph**, in the `photo`
+column of `reviews.csv` and the files in `assets/reviews/`. Same rule as
+everything else here: only reviews that were already in that file got one, the
+photo is joined to the review by the review's own text, and clearing a cell
+removes the picture. These are photos posted publicly on the supplier's
+listing, and the line under the reviews heading says so.
 
 ---
 

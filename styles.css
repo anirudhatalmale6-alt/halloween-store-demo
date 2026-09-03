@@ -269,7 +269,11 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   background:rgba(123,255,106,.14);border:1px solid rgba(123,255,106,.5);color:var(--green);
   font-size:.8rem;font-weight:700;letter-spacing:.6px;padding:.35rem .65rem;border-radius:8px;
 }
-.pdp__thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+/* Four across, not three. Three was right when a product had at most four
+   photos; the supplier galleries run to eight, and eight over three columns
+   is two full rows plus an orphan sitting alone under them. Four gives 8 a
+   clean 4+4 and 7 a 4+3, and the thumbs stay above 70px wide even at 360. */
+.pdp__thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
 .pdp__thumb{
   background:radial-gradient(circle at 50% 45%,#241a33,#120d1b);
   border:1px solid var(--line2);border-radius:12px;padding:8px;cursor:pointer;
@@ -791,9 +795,11 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   max-width:720px;margin-left:auto;margin-right:auto;line-height:1.6}
 .rev__t{display:block;font-size:.95rem;margin-bottom:.5rem;color:var(--orange2)}
 .rev__of{font-size:.78rem;color:var(--muted);font-style:italic}
-/* Empty in every row today - the supplier's review images sit behind expiring
-   signed URLs. The rule is here so dropping a filename into the photo column
-   of reviews.csv produces a laid-out customer photo with no CSS work. */
+/* 68 of the 126 reviews now carry a real customer photo. They are DOWNLOADED,
+   not hot-linked: the supplier's review image URLs carry expiring signatures
+   and would have gone dark within days. Drop a filename into the photo column
+   of reviews.csv and a row grows a photo with no CSS work; empty the cell and
+   it loses one. */
 .rev__img{width:100%;border-radius:12px;margin-top:1rem;background:#f7f4ef;
   max-height:230px;object-fit:cover}
 .rev blockquote{
