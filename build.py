@@ -65,6 +65,31 @@ def load_prices():
                         print(f"  ! {p['slug']}: {col} is not a number: {raw!r}")
             if p["price"] is not None:
                 n += 1
+
+    # A price on a delisted product is the one entry in this spreadsheet that
+    # can cost real money. Pricing a product is exactly what switches its Buy
+    # button on, and these fifteen have no supplier behind them - so the row
+    # that looks like progress is the row that sells something unshippable.
+    #
+    # The price is refused rather than applied, because the safe direction is
+    # obvious: not selling an item you could have sold is a slow day, selling
+    # one you cannot ship is a refund, a chargeback and a review. It is refused
+    # LOUDLY - a silently dropped price would send him hunting for a bug in the
+    # build. Re-listing is a deliberate act: take the slug out of UNAVAILABLE
+    # in catalog.py once a supplier is confirmed, and the price applies.
+    blocked = []
+    for p in catalog.PRODUCTS:
+        if p["slug"] in catalog.UNAVAILABLE and p["price"] is not None:
+            blocked.append((p["slug"], p["price"]))
+            p["price"] = p["was"] = None
+            n -= 1
+    if blocked:
+        print("  !! prices.csv prices a product the supplier no longer lists:")
+        for s, v in blocked:
+            print(f"     {s}  ${v:.2f}  - IGNORED, its Buy button stays off")
+        print("     these cannot be fulfilled. To sell one anyway, remove it")
+        print("     from UNAVAILABLE in catalog.py first.")
+
     # A "was" price below the selling price would render a negative discount.
     for p in catalog.PRODUCTS:
         if p["price"] and p["was"] and p["was"] <= p["price"]:
@@ -573,12 +598,43 @@ def img_for(p, i=0, base=""):
     return f"{base}assets/products/{name}"
 
 
+QTY_HTML = """<div class="qty" id="qty">
+          <button type="button" data-q="-1" aria-label="Decrease quantity">&minus;</button>
+          <b id="qtyn">1</b>
+          <button type="button" data-q="1" aria-label="Increase quantity">+</button>
+        </div>
+        """
+
+
+def is_dead(p):
+    """True for the products the supplier has stopped listing.
+
+    The client chose to keep all fifteen on the site rather than delete them,
+    so they need a state of their own. They are not "not priced yet" - that is
+    a note to him about work outstanding, and it was being shown to shoppers.
+    """
+    return p["slug"] in catalog.UNAVAILABLE
+
+
 def price_html(p, cls=""):
     """The price block, or a visible marker that no price has been set yet.
 
     An empty gap where a price belongs reads as a bug. An orange "set your
     price" chip reads as the one job left to do, which is what it is.
+
+    Two different absences of a price, so two different labels. "Price to be
+    set" is addressed to the client and means one decision away from selling.
+    A delisted product is not one decision away from anything, and telling a
+    shopper its price is pending implies it is coming back.
     """
+    if p["price"] is None and is_dead(p):
+        # Short label in the grid, full sentence on the product page. Uppercase
+        # with letter-spacing, "Currently unavailable" measures 233px, and a
+        # card's price row on a 390px phone is 145px - it overflowed the card,
+        # then the grid, then the page, which is how one word widened the whole
+        # layout to 417px. The card has room for one word, so it gets one word.
+        label = "Unavailable" if cls.startswith("card") else "Currently unavailable"
+        return f'<div class="{cls} noprice"><span class="tag-soldout">{label}</span></div>'
     if p["price"] is None:
         return f'<div class="{cls} noprice"><span class="tag-setprice">Price to be set</span></div>'
     was = f'<span class="was">{money(p["was"])}</span>' if p.get("was") else ""
@@ -624,8 +680,13 @@ def product_card(p, base="", href=None):
     name = html.escape(p["name"])
     label = c("buttons.add_to_cart", "Add to Cart")
     if p["price"] is None:
-        add = ('<button class="btn btn--add" type="button" disabled '
-               'title="Set a price for this product first">Add to Cart</button>')
+        # Two reasons a card cannot sell, and only one of them is a to-do.
+        # Telling him to price a delisted product is advice that now cannot be
+        # taken - load_prices() refuses that price on purpose.
+        tip = ("This product has been delisted by the supplier"
+               if is_dead(p) else "Set a price for this product first")
+        add = (f'<button class="btn btn--add" type="button" disabled '
+               f'title="{tip}">Add to Cart</button>')
     else:
         add = (f'<button class="btn btn--add" type="button" data-add="{p["slug"]}" '
                f'data-name="{html.escape(p["name"], quote=True)}" data-price="{p["price"]}">'
@@ -955,7 +1016,39 @@ def landing_page(p, others):
     price_block = price_html(p, "pdp__price").replace(
         "</div>", f"{save}</div>") if save else price_html(p, "pdp__price")
 
-    if p["price"] is None:
+    # Defaults for every product; only the delisted branch below overrides them.
+    qty_html = QTY_HTML
+    trust_list = c("product_trust_list", [])
+
+    if p["price"] is None and is_dead(p):
+        # Kept on the site at the client's request, but honest about it. No
+        # "notify me" box: there is nothing behind one, and a control that
+        # collects an address nobody reads is worse than no control.
+        # One word, for the same reason as the card label. .btn sets nowrap and
+        # 1.9rem of side padding, so "Currently unavailable" gives the button a
+        # min-content width of 401px - wider than a 390px phone - and a
+        # full-width button that cannot shrink drags the whole column with it.
+        # The price block directly above already says it in full.
+        buy_button = ('<button class="btn btn--gold btn--wide" type="button" disabled>'
+                      'Unavailable</button>')
+        buynow_button = ""
+        stick_button = ('<button class="btn btn--gold" type="button" disabled>'
+                        'Unavailable</button>')
+        # No price chip in the sticky bar. "Currently unavailable" sets
+        # white-space:nowrap, and at 166px beside the button it pushed the bar
+        # to 417px on a 390px phone - which widened the whole page, not just
+        # the bar, because the bar is fixed. The button already says it.
+        stick_price = ""
+        # No quantity stepper: it is a working control wired to a button that
+        # can never fire, so it invites a shopper to set a number that does
+        # nothing. And none of the delivery promises can be kept on a product
+        # with no supplier - "ships within 24 hours", "delivered before Oct 31
+        # or it's free" - so they are replaced by the one true sentence.
+        qty_html = ""
+        trust_list = [c("unavailable_note",
+                        "This one has sold out at our supplier. "
+                        "Everything else on the site ships as normal.")]
+    elif p["price"] is None:
         buy_button = ('<button class="btn btn--gold btn--wide" type="button" disabled>'
                       'Price not set yet</button>')
         buynow_button = ""
@@ -990,6 +1083,10 @@ def landing_page(p, others):
 
     buynow_note = (f'      <p class="pdp__bnote">{esc(c("buttons.buy_now_note", ""))}</p>\n'
                    if buynow_button and c("buttons.buy_now_note") else "")
+
+    # The delisted note shares the trust list's markup but not its green tick.
+    li_cls = ' class="note"' if is_dead(p) else ""
+    trust_html = "".join(f"        <li{li_cls}>{esc(x)}</li>\n" for x in trust_list)
 
     # "limited stock left at this price" cannot be shown on a product with no
     # price, and it is a claim about stock levels nobody has checked. It only
@@ -1075,16 +1172,11 @@ def landing_page(p, others):
 
 {stock_bar}
       <div class="pdp__act">
-        <div class="qty" id="qty">
-          <button type="button" data-q="-1" aria-label="Decrease quantity">&minus;</button>
-          <b id="qtyn">1</b>
-          <button type="button" data-q="1" aria-label="Increase quantity">+</button>
-        </div>
-        {buy_button}
+        {qty_html}{buy_button}
       </div>
 {buynow_button}{buynow_note}
       <ul class="pdp__trust">
-{"".join(f"        <li>{esc(x)}</li>" + chr(10) for x in c("product_trust_list", []))}      </ul>
+{trust_html}      </ul>
     </div>
 
   </div>

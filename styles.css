@@ -340,6 +340,13 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   content:'';position:absolute;left:0;top:.5rem;width:10px;height:6px;
   border-left:2px solid var(--green);border-bottom:2px solid var(--green);transform:rotate(-45deg);
 }
+/* The delisted-product note sits in this same list, and a green tick in front
+   of "this has sold out" reads as a promise being kept. Neutral dot instead. */
+.pdp__trust li.note{color:#b9b3a6}
+.pdp__trust li.note::before{
+  content:'';left:1px;top:.62rem;width:5px;height:5px;border:0;border-radius:50%;
+  background:#7c7466;transform:none;
+}
 
 /* features */
 .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:2.8rem}
@@ -382,6 +389,13 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .stick__m s{margin-left:.3rem;opacity:.65}
 .stick .btn--add{flex:0 0 auto;background:linear-gradient(135deg,var(--orange),var(--orange2));
   color:#1a0c02;border:0;padding:.7rem 1.3rem}
+/* Every button in the bar, not just .btn--add. The sold-out button is a plain
+   .btn, so it matched no sizing rule and was laid out at its own text width -
+   "Unavailable" is wider than "Buy It Now", and the bar is position:fixed, so
+   overflowing it widened the whole PAGE to 417px on a 390px phone rather than
+   just clipping. Sized here so any future label is safe by construction. */
+.stick .btn{flex:0 1 auto;min-width:0;padding:.7rem 1rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---------- why ---------- */
 .why{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
@@ -620,6 +634,29 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 }
 .pdp__price .tag-setprice{font-size:.85rem;padding:.5rem .85rem}
 .stick__m .tag-setprice{font-size:.62rem;padding:.22rem .42rem}
+
+/* "Currently unavailable" - the fifteen products the supplier dropped, kept
+   on the site on purpose. Deliberately grey and quiet, not orange: the orange
+   chip is a to-do addressed to the shop owner, and these two states sat side
+   by side on the same grid looking equally like something about to happen. */
+.tag-soldout{
+  display:inline-block;
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:#b9b3a6;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.16);
+  padding:.3rem .56rem;
+  border-radius:6px;
+  /* deliberately NOT nowrap, unlike .tag-setprice: this label is twice as long
+     and has to survive the narrowest card in the grid. If it ever cannot fit
+     it wraps to two lines instead of pushing the page wider than the phone. */
+  max-width:100%;
+}
+.pdp__price .tag-soldout{font-size:.85rem;padding:.46rem .8rem}
+.stick__m .tag-soldout{font-size:.62rem;padding:.2rem .4rem}
 
 /* A disabled buy button must not look clickable. Without this it keeps the
    gold gradient and reads as live. */
