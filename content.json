@@ -15,13 +15,11 @@
     "Anything you empty out disappears from the site rather than rendering as a blank gap.",
     "Set a `show` flag to false to switch a whole block off."
   ],
-
   "brand": {
     "name": "Hollow & Hex",
     "tagline": "Haunt Your House. Ship It Free.",
     "footer_blurb": "Light-up masks, floating candles, yard ghosts and decor, shipped free across the US and guaranteed before October 31st."
   },
-
   "announcement": {
     "show": true,
     "lines": [
@@ -30,14 +28,12 @@
     ],
     "show_countdown": true
   },
-
   "countdown": {
     "show": true,
     "label": "until Halloween",
     "target_month": 10,
     "target_day": 31
   },
-
   "hero": {
     "eyebrow": "Halloween 2026 Collection",
     "heading_top": "Haunt Your House.",
@@ -58,48 +54,54 @@
       "pumpkin-blanket-hoodie"
     ]
   },
-
   "trust_bar": [
-    ["Free US Shipping", "On every order, no minimum"],
-    ["Ships in 24 Hours", "Order by 3pm, out the same day"],
-    ["Delivered Before Oct 31", "Guaranteed or it's free"],
-    ["30-Day Returns", "Unopened, no questions asked"]
+    [
+      "Free US Shipping",
+      "On every order, no minimum"
+    ],
+    [
+      "Ships in 24 Hours",
+      "Order by 3pm, out the same day"
+    ],
+    [
+      "Delivered Before Oct 31",
+      "Guaranteed or it's free"
+    ],
+    [
+      "30-Day Returns",
+      "Unopened, no questions asked"
+    ]
   ],
-
   "product_trust_list": [
     "Free US shipping, no minimum",
     "Guaranteed delivered before Oct 31 or it's free",
     "Ships within 24 hours from a US warehouse",
     "30-day returns, no questions asked"
   ],
-
   "urgency": {
     "show_stock_bar": true,
     "text": "Selling fast - limited stock left at this price",
     "bar_percent": 22
   },
-
   "categories_nav": {
     "show": true,
     "eyebrow": "Shop by",
     "heading": "Categories",
     "sub": "Tap a category to jump straight to it."
   },
-
   "shop": {
     "eyebrow": "The collection",
     "heading": "Shop Halloween 2026",
     "sub": "Every item ships free, and is guaranteed to land before October 31st."
   },
-
   "reviews_section": {
     "show": true,
+    "min_stars": 5,
     "eyebrow": "Product reviews",
     "heading": "What buyers say about these products",
-    "note": "Reviews and photos left by verified buyers of these products on the supplier's listing. Product reviews, not store reviews - once your own orders start coming in, a reviews app replaces these with yours.",
+    "note": "Reviews and photos left by verified buyers of these products on the supplier's listing. Showing 5-star reviews only - the star rating above each product is its full average across all reviews. Product reviews, not store reviews - once your own orders start coming in, a reviews app replaces these with yours.",
     "count_label": "verified product reviews across the collection"
   },
-
   "why_us": {
     "show": true,
     "eyebrow": "Why us",
@@ -115,43 +117,66 @@
     "cta": "Start Shopping",
     "photo": "tripod-cauldron-fog"
   },
-
   "email_capture": {
     "show": true,
     "heading": "Get 10% off your first order",
     "paragraph": "One email when the new drops land. Nothing else, and you can leave any time.",
     "button": "Send My Code"
   },
-
   "faq": [
-    ["Will it arrive before Halloween?",
-     "Yes. Every order placed before October 20th is guaranteed to land on your doorstep by October 30th, or we refund you in full and you keep the item."],
-    ["How much is shipping?",
-     "Nothing. Shipping is free on every order in the continental US, with no minimum spend. Alaska, Hawaii and Canada are a flat $7.95."],
-    ["Can I return something?",
-     "Anything unopened can come back within 30 days for a full refund. If an item arrives damaged, send us a photo and we ship a replacement the same day - no return needed."],
-    ["Do the light-up items come with batteries?",
-     "The rechargeable pieces - the hero masks, the under-cabinet bars and the pumpkin night light - arrive charged with a USB-C cable in the box. The battery-powered decorations take standard AA or AAA cells, which are not included."],
-    ["Do you ship outside the US?",
-     "We ship to Canada, the UK, Ireland and Australia. Delivery runs 6-10 days, so international orders should go in before October 15th."]
+    [
+      "Will it arrive before Halloween?",
+      "Yes. Every order placed before October 20th is guaranteed to land on your doorstep by October 30th, or we refund you in full and you keep the item."
+    ],
+    [
+      "How much is shipping?",
+      "Nothing. Shipping is free on every order in the continental US, with no minimum spend. Alaska, Hawaii and Canada are a flat $7.95."
+    ],
+    [
+      "Can I return something?",
+      "Anything unopened can come back within 30 days for a full refund. If an item arrives damaged, send us a photo and we ship a replacement the same day - no return needed."
+    ],
+    [
+      "Do the light-up items come with batteries?",
+      "The rechargeable pieces - the hero masks, the under-cabinet bars and the pumpkin night light - arrive charged with a USB-C cable in the box. The battery-powered decorations take standard AA or AAA cells, which are not included."
+    ],
+    [
+      "Do you ship outside the US?",
+      "We ship to Canada, the UK, Ireland and Australia. Delivery runs 6-10 days, so international orders should go in before October 15th."
+    ]
   ],
-
   "product_features": [
-    ["Ships free, ships fast",
-     "Out of a US warehouse within 24 hours of your order, tracked the whole way. No six-week wait from overseas."],
-    ["Guaranteed before Halloween",
-     "Order by October 20th and it is on your doorstep by the 30th, or you do not pay for it."],
-    ["30 days to change your mind",
-     "Unopened returns for a full refund. Damaged in transit, send a photo and we reship the same day."]
+    [
+      "Ships free, ships fast",
+      "Out of a US warehouse within 24 hours of your order, tracked the whole way. No six-week wait from overseas."
+    ],
+    [
+      "Guaranteed before Halloween",
+      "Order by October 20th and it is on your doorstep by the 30th, or you do not pay for it."
+    ],
+    [
+      "30 days to change your mind",
+      "Unopened returns for a full refund. Damaged in transit, send a photo and we reship the same day."
+    ]
   ],
-
   "product_specs": [
-    ["Ships from", "United States"],
-    ["Shipping", "Free, 2-5 business days"],
-    ["Returns", "30 days, unopened"],
-    ["Stock", "In stock now"]
+    [
+      "Ships from",
+      "United States"
+    ],
+    [
+      "Shipping",
+      "Free, 2-5 business days"
+    ],
+    [
+      "Returns",
+      "30 days, unopened"
+    ],
+    [
+      "Stock",
+      "In stock now"
+    ]
   ],
-
   "buttons": {
     "add_to_cart": "Add to Cart",
     "buy_now": "Buy It Now",
@@ -160,6 +185,5 @@
     "cart_shipping_line": "FREE",
     "cart_note": "Demo storefront - checkout is not connected to a payment provider."
   },
-
   "footer_note": "© 2026 Hollow & Hex. Demo storefront built for review - not a live shop."
 }

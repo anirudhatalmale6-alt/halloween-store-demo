@@ -167,13 +167,25 @@ def load_reviews():
     Real quotes from verified buyers of the supplier's listing. They are
     reviews of the PRODUCT, not of this store, and the section heading says
     so. Delete a row and it is gone from the site on the next build.
+
+    reviews_section.min_stars decides which of them are shown. The client asked
+    for 5 only. Nothing is deleted from reviews.csv - every review stays in the
+    file and comes straight back by lowering one number, because "show the 4s
+    again" should not mean re-scraping a supplier listing that may be gone.
     """
     path = os.path.join(HERE, "reviews.csv")
     out = {}
     if not os.path.exists(path):
         return out
     known = {p["slug"] for p in catalog.PRODUCTS}
+    try:
+        min_stars = float(c("reviews_section.min_stars", 5))
+    except (TypeError, ValueError):
+        print("  ! reviews_section.min_stars is not a number - showing all")
+        min_stars = 0
     stray = 0
+    hidden = 0
+    had = set()   # products that had at least one review BEFORE the star filter
     with open(path, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             slug = (row.get("handle") or "").strip()
@@ -187,6 +199,10 @@ def load_reviews():
                 rate = float((row.get("rating") or "5").strip())
             except ValueError:
                 rate = 5.0
+            had.add(slug)
+            if rate < min_stars:
+                hidden += 1
+                continue
             out.setdefault(slug, []).append({
                 "name": (row.get("name") or "Verified buyer").strip(),
                 "rating": rate,
@@ -199,6 +215,19 @@ def load_reviews():
     if stray:
         print(f"  ! reviews.csv: {stray} rows name a product that does not "
               f"exist - they are not on the site")
+    if hidden:
+        print(f"  reviews.csv: {hidden} reviews below {min_stars:g} stars are "
+              f"hidden (still in the file)")
+        # The cost of the filter, named out loud. A product that had reviews
+        # and now has none loses its whole review section, and silently losing
+        # it on the hero product is exactly the kind of thing you find out
+        # about from the client rather than from the build.
+        emptied = sorted(had - set(out))
+        if emptied:
+            print(f"  !! {len(emptied)} product(s) now show NO reviews at all, "
+                  f"their review section disappears:")
+            for s in emptied:
+                print(f"     {s}")
     return out
 
 
