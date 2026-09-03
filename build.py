@@ -5,23 +5,32 @@ Hollow & Hex - demo Halloween storefront generator.
 Run:  python3 build.py
 Emits index.html plus the product artwork in assets/products/.
 
-The catalogue itself lives in catalog.py - 52 real products recovered from the
-links the client sent. Everything else a client normally wants to change lives
-in TRUST / FAQ below.
+Four files feed it, and between them they hold everything a non-programmer
+would want to change:
+
+  catalog.py    the 52 real products - names, photos, categories, blurbs
+  prices.csv    your selling price and compare-at price, one row per product
+  social.csv    star rating, review count and units sold, one row per product
+  reviews.csv   the review quotes themselves
+  content.json  EVERY line of shipping, delivery, guarantee, warehouse and
+                countdown wording on the site, in one place
 
 Two things this generator will not do, both on purpose:
 
   * It will not invent a price. A product with no price renders a "price to be
     set" chip and a disabled buy button, so an unpriced page is obviously
     unfinished rather than quietly wrong.
-  * It will not invent a star rating or a review count. Real products go in
-    front of real customers, and manufactured social proof on a live store is
-    not a placeholder, it is a lie. The rating block and the reviews section
-    hide themselves until there is something true to put in them.
+  * It will not invent a star rating or a review count. Every rating and every
+    review quote on this site was read off the supplier's own listing for that
+    exact product. Where the supplier has none, the star row is absent - it
+    does NOT fall back to a flattering default, because a 4.8 nobody earned is
+    not a placeholder, it is a false claim, and it is the client's name on it.
 """
 
 import os
 import re
+import csv
+import json
 import html
 
 import catalog
@@ -37,7 +46,6 @@ def load_prices():
     unpriced rather than defaulting to zero - a $0.00 product looks like a
     working price and is the worst possible failure here.
     """
-    import csv
     path = os.path.join(HERE, "prices.csv")
     if not os.path.exists(path):
         return 0
@@ -64,12 +72,131 @@ def load_prices():
                   f"your_price {p['price']} - discount badge suppressed")
             p["was"] = None
     return n
+
+
+def load_content():
+    """Read content.json - every editable line of copy on the site.
+
+    Missing keys fall back to the defaults below rather than raising, so a
+    client who deletes a block gets the block's default back instead of a
+    stack trace. Missing is different from EMPTY: an empty string switches a
+    line off, which is how you remove a claim you do not want to make.
+    """
+    path = os.path.join(HERE, "content.json")
+    if not os.path.exists(path):
+        print("  ! content.json missing - using built-in defaults")
+        return {}
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_social():
+    """Overlay social.csv - rating, review count, units sold - per product.
+
+    Nothing in this file was written by me. Every figure came off the
+    supplier's own listing page for that product. A blank cell means the
+    supplier has no rating for it, and the star row then does not render at
+    all. See make_social_csv.py for exactly how each number was obtained.
+    """
+    path = os.path.join(HERE, "social.csv")
+    by_slug = {p["slug"]: p for p in catalog.PRODUCTS}
+    for p in catalog.PRODUCTS:
+        p.setdefault("rating", None)
+        p.setdefault("reviews", None)
+        p.setdefault("sold", None)
+    if not os.path.exists(path):
+        return 0
+    n = 0
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            p = by_slug.get((row.get("handle") or "").strip())
+            if not p:
+                continue
+            r = (row.get("rating") or "").strip()
+            if not r:
+                continue
+            try:
+                p["rating"] = float(r)
+            except ValueError:
+                print(f"  ! {p['slug']}: rating is not a number: {r!r}")
+                continue
+            # A rating with no count behind it is the weaker of the two claims
+            # and the one shoppers discount, so it is allowed - but a count
+            # that will not parse is dropped rather than shown as text.
+            for key, col in (("reviews", "reviews"), ("sold", "sold")):
+                raw = (row.get(col) or "").strip().replace(",", "")
+                if raw.isdigit():
+                    p[key] = int(raw)
+            if not 0 < p["rating"] <= 5:
+                print(f"  ! {p['slug']}: rating {p['rating']} is outside 1-5 "
+                      f"- ignored")
+                p["rating"] = None
+                continue
+            n += 1
+    return n
+
+
+def load_reviews():
+    """Read reviews.csv into {slug: [review, ...]}.
+
+    Real quotes from verified buyers of the supplier's listing. They are
+    reviews of the PRODUCT, not of this store, and the section heading says
+    so. Delete a row and it is gone from the site on the next build.
+    """
+    path = os.path.join(HERE, "reviews.csv")
+    out = {}
+    if not os.path.exists(path):
+        return out
+    known = {p["slug"] for p in catalog.PRODUCTS}
+    stray = 0
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            slug = (row.get("handle") or "").strip()
+            text = (row.get("text") or "").strip()
+            if not text:
+                continue
+            if slug not in known:
+                stray += 1
+                continue
+            try:
+                rate = float((row.get("rating") or "5").strip())
+            except ValueError:
+                rate = 5.0
+            out.setdefault(slug, []).append({
+                "name": (row.get("name") or "Verified buyer").strip(),
+                "rating": rate,
+                "title": (row.get("title") or "").strip(),
+                "text": text,
+                "verified": (row.get("verified") or "").strip().lower()
+                            in ("yes", "y", "true", "1"),
+                "photo": (row.get("photo") or "").strip(),
+            })
+    if stray:
+        print(f"  ! reviews.csv: {stray} rows name a product that does not "
+              f"exist - they are not on the site")
+    return out
+
+
 ART_DIR = os.path.join(HERE, "assets", "products")
 
-# Set to False to remove the "selling fast, limited stock" bar from every
-# product page at once. It is an urgency claim, so it should only be on when
-# the client is comfortable standing behind it.
-SHOW_STOCK_BAR = True
+# Filled by build(). Module level so the page builders can reach them without
+# threading two more arguments through every function.
+C = {}
+REVIEWS_BY_SLUG = {}
+
+
+def c(path, default=""):
+    """Look up a dotted path in content.json, e.g. c("hero.cta_primary").
+
+    Returns `default` when the key is missing, so a client can delete a key
+    they do not understand and get the sensible thing back.
+    """
+    node = C
+    for part in path.split("."):
+        if not isinstance(node, dict) or part not in node:
+            return default
+        node = node[part]
+    return node
 
 BRAND = "Hollow & Hex"
 TAGLINE = "Haunt Your House. Ship It Free."
@@ -365,32 +492,29 @@ CATEGORIES = catalog.CATEGORIES
 DETAILS = {}
 
 
-REVIEWS = []
-# Empty on purpose. The demo carried three written-by-me testimonials, which
-# was fine when the products were invented too. These products are real and
-# will be sold to real people, so the reviews section stays hidden until there
-# are reviews. Connect a reviews app (Judge.me, Loox) on Shopify and it fills
-# itself from actual orders.
+# These four used to be Python lists here. They now come from content.json so
+# the client can change a delivery promise without opening a .py file, and the
+# lists below are only the fallback for a deleted key.
+def trust_items():
+    return [tuple(x) for x in c("trust_bar", [
+        ("Free US Shipping", "On every order, no minimum"),
+        ("Ships in 24 Hours", "Order by 3pm, out the same day"),
+        ("Delivered Before Oct 31", "Guaranteed or it's free"),
+        ("30-Day Returns", "Unopened, no questions asked"),
+    ])]
 
-TRUST = [
-    ("Free US Shipping", "On every order, no minimum"),
-    ("Ships in 24 Hours", "Order by 3pm, out the same day"),
-    ("Delivered Before Oct 31", "Guaranteed or it's free"),
-    ("30-Day Returns", "Unopened, no questions asked"),
-]
 
-FAQ = [
-    ("Will it arrive before Halloween?",
-     "Yes. Every order placed before October 20th is guaranteed to land on your doorstep by October 30th, or we refund you in full and you keep the item."),
-    ("How much is shipping?",
-     "Nothing. Shipping is free on every order in the continental US, with no minimum spend. Alaska, Hawaii and Canada are a flat $7.95."),
-    ("Can I return something?",
-     "Anything unopened can come back within 30 days for a full refund. If an item arrives damaged, send us a photo and we ship a replacement the same day - no return needed."),
-    ("Do the light-up items come with batteries?",
-     "The rechargeable pieces - the hero masks, the under-cabinet bars and the pumpkin night light - arrive charged with a USB-C cable in the box. The battery-powered decorations take standard AA or AAA cells, which are not included."),
-    ("Do you ship outside the US?",
-     "We ship to Canada, the UK, Ireland and Australia. Delivery runs 6-10 days, so international orders should go in before October 15th."),
-]
+def faq_items():
+    return [tuple(x) for x in c("faq", [])]
+
+
+def cat_anchor(name):
+    """Homepage anchor id for a category section. `LED Masks` -> `cat-led-masks`.
+
+    The nav chip and the section heading both call this, so they cannot drift
+    apart - which is the entire failure mode of a hand-written anchor list.
+    """
+    return "cat-" + re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 # --------------------------------------------------------------------------
@@ -460,6 +584,25 @@ def discount_chip(p):
     return f'<span class="card__off">-{off}%</span>'
 
 
+def rating_row(p, cls="card__rating"):
+    """Stars + review count, or nothing at all.
+
+    There is no fallback rating. A product the supplier has no reviews for
+    renders an empty string here and the card closes the gap, rather than
+    showing a default that would be a claim nobody can support.
+    """
+    # An EMPTY div, not no div. The row is a fixed height in CSS, so a product
+    # with no supplier rating still reserves the space and the titles across a
+    # row of four line up. Dropping the element entirely pulled unrated cards
+    # up by 22px and made the grid look misaligned rather than incomplete.
+    if not p.get("rating"):
+        return f'<div class="{cls} {cls}--none"></div>'
+    n = p.get("reviews")
+    count = f'<span class="card__rcount">({n:,})</span>' if n else ""
+    return (f'<div class="{cls}">{stars(p["rating"])}'
+            f'<span class="card__rval">{p["rating"]:.1f}</span>{count}</div>')
+
+
 def product_card(p, base="", href=None):
     """A grid card. `href` is the product's landing page; `base` prefixes assets.
 
@@ -469,13 +612,18 @@ def product_card(p, base="", href=None):
     badge = f'<span class="badge">{html.escape(p["badge"])}</span>' if p.get("badge") else ""
     href = href if href is not None else f"p/{p['slug']}/"
     name = html.escape(p["name"])
+    label = c("buttons.add_to_cart", "Add to Cart")
     if p["price"] is None:
         add = ('<button class="btn btn--add" type="button" disabled '
                'title="Set a price for this product first">Add to Cart</button>')
     else:
         add = (f'<button class="btn btn--add" type="button" data-add="{p["slug"]}" '
                f'data-name="{html.escape(p["name"], quote=True)}" data-price="{p["price"]}">'
-               f'Add to Cart</button>')
+               f'{html.escape(label)}</button>')
+    # "1,082 sold" is the strongest line on the card when it is there, and it
+    # is only there for the products the supplier publishes a figure for.
+    sold = (f'<p class="card__sold">{p["sold"]:,}+ sold</p>'
+            if p.get("sold") else "")
     return f"""      <article class="card" data-slug="{p['slug']}">
         <a class="card__media" href="{href}">
           {badge}
@@ -483,8 +631,10 @@ def product_card(p, base="", href=None):
           <img src="{img_for(p, 0, base)}" alt="{name}" loading="lazy" width="600" height="600" />
         </a>
         <div class="card__body">
+          {rating_row(p)}
           <h3 class="card__name"><a href="{href}">{name}</a></h3>
           <p class="card__blurb">{html.escape(p['blurb'])}</p>
+          {sold}
           <div class="card__foot">
             {price_html(p, "card__price")}
             {add}
@@ -494,25 +644,74 @@ def product_card(p, base="", href=None):
 """
 
 
-def category_card(title, sub, slug):
+def category_card(title, sub, slug, home=""):
     """`slug` names the product whose photo fronts this category tile.
 
     catalog.check() asserts every one of those slugs exists, so a renamed
     product breaks the build rather than silently emptying a tile.
+
+    The href is the category's own section further down the SAME page, not the
+    single "shop" block it used to be - clicking Apparel now lands you on the
+    apparel products rather than at the top of all 52.
     """
     front = [x for x in PRODUCTS if x["slug"] == slug][0]
-    return f"""      <a class="cat" href="#shop">
+    n = sum(1 for x in PRODUCTS if x["cat"] == title)
+    return f"""      <a class="cat" href="{home}#{cat_anchor(title)}">
         <img src="{img_for(front)}" alt="" aria-hidden="true" loading="lazy" width="600" height="600" />
-        <div class="cat__txt"><h3>{html.escape(title)}</h3><p>{html.escape(sub)}</p></div>
+        <div class="cat__txt"><h3>{html.escape(title)}</h3><p>{html.escape(sub)}</p>
+          <span class="cat__n">{n} product{"s" if n != 1 else ""}</span></div>
       </a>
 """
 
 
-def review_card(name, place, rate, text):
+def cat_chips(home=""):
+    """The jump bar. Sticks under the header so it is reachable from anywhere.
+
+    Same cat_anchor() as the section ids, so a category renamed in catalog.py
+    moves the chip and its target together.
+    """
+    chips = "".join(
+        f'<a class="chip" href="{home}#{cat_anchor(t)}">{html.escape(t)}</a>'
+        for t, _, _ in CATEGORIES)
+    return f"""<nav class="chips" id="chips" aria-label="Jump to a category">
+  <div class="wrap chips__in">
+    <a class="chip chip--all" href="{home}#shop">All</a>
+    {chips}
+  </div>
+</nav>
+"""
+
+
+def review_card(r, product_name=None):
+    """One review. `r` is a row out of reviews.csv.
+
+    The `photo` column is empty in every row today - the supplier's review
+    images sit behind expiring signed URLs and would 404 within days. The
+    column and the markup are here so a customer photo can be dropped in
+    later without touching this file: put a filename in the column and the
+    figure grows an image.
+    """
+    # The supplier masks reviewer names itself ("S**r"), which is why no real
+    # name is republished here. A few of them start with an emoji instead of a
+    # letter, and "@**y" renders as a broken glyph rather than as a person, so
+    # anything with no leading letter falls back to the neutral label. The CSV
+    # keeps whatever was harvested - this is a display rule, not an edit.
+    raw = (r["name"] or "").strip()
+    name = html.escape(raw if raw[:1].isalpha() else "Verified buyer")
+    ver = ('<span class="rev__v">Verified purchase</span>'
+           if r.get("verified") else "")
+    of = (f'<span class="rev__of">on {html.escape(product_name)}</span>'
+          if product_name else "")
+    photo = (f'<img class="rev__img" src="{html.escape(r["photo"], quote=True)}" '
+             f'alt="" loading="lazy" />' if r.get("photo") else "")
+    title = (f'<strong class="rev__t">{html.escape(r["title"])}</strong>'
+             if r.get("title") else "")
     return f"""      <figure class="rev">
-        <div class="rev__stars">{stars(rate)}</div>
-        <blockquote>{html.escape(text)}</blockquote>
-        <figcaption><strong>{html.escape(name)}</strong><span>{html.escape(place)}</span><span class="rev__v">Verified buyer</span></figcaption>
+        <div class="rev__stars">{stars(r["rating"])}</div>
+        {title}
+        <blockquote>{html.escape(r["text"])}</blockquote>
+        {photo}
+        <figcaption><strong>{name}</strong>{of}{ver}</figcaption>
       </figure>
 """
 
@@ -543,21 +742,52 @@ LOGO = """<svg class="logo__mark" viewBox="0 0 64 64" aria-hidden="true">
 # `base` prefixes asset paths, `home` prefixes in-page anchors.
 # --------------------------------------------------------------------------
 
-# No "Reviews" entry: the reviews section hides itself while REVIEWS is empty,
-# and a nav link that scrolls nowhere is worse than one less link.
-NAV = [("shop", "Shop All"), ("cats", "Categories"), ("why", "Why Us"),
-       ("faq", "FAQ")]
+def nav_items():
+    """The header links. A link is only emitted if its target will exist.
+
+    "Reviews" appears once there are reviews to scroll to and not before - a
+    nav link that scrolls nowhere is worse than one less link, and it was
+    missing for exactly that reason until the supplier reviews arrived.
+    """
+    items = [("shop", "Shop All"), ("cats", "Categories")]
+    if REVIEWS_BY_SLUG and c("reviews_section.show", True):
+        items.append(("reviews", "Reviews"))
+    if c("why_us.show", True):
+        items.append(("why", "Why Us"))
+    if faq_items():
+        items.append(("faq", "FAQ"))
+    return items
 
 
 def announce_html():
-    return """<div class="ann">
-  <p>FREE US SHIPPING ON EVERYTHING &nbsp;&middot;&nbsp; Order by Oct 20 and it lands before Halloween &nbsp;&middot;&nbsp; <strong id="ann-count">&nbsp;</strong></p>
+    """The announcement bar, entirely from content.json.
+
+    `announcement.lines` is a list, so adding or removing a claim is adding or
+    removing a line - and emptying the list removes the bar rather than
+    leaving an empty orange strip across the top of the site.
+    """
+    if not c("announcement.show", True):
+        return ""
+    lines = [x for x in c("announcement.lines", []) if x.strip()]
+    if not lines and not c("announcement.show_countdown", True):
+        return ""
+    # &nbsp; not a plain space: the separator sits between two escaped strings
+    # and a normal space here has been eaten by whitespace stripping before.
+    sep = " &nbsp;&middot;&nbsp; "
+    body = sep.join(html.escape(x) for x in lines)
+    if c("announcement.show_countdown", True):
+        if body:
+            body += sep
+        body += '<strong id="ann-count">&nbsp;</strong>'
+    return f"""<div class="ann">
+  <p>{body}</p>
 </div>
 """
 
 
 def header_html(base, home):
-    links = "".join(f'      <a href="{home}#{a}">{html.escape(t)}</a>\n' for a, t in NAV)
+    links = "".join(f'      <a href="{home}#{a}">{html.escape(t)}</a>\n'
+                    for a, t in nav_items())
     return f"""<header class="hdr" id="hdr">
   <div class="wrap hdr__in">
     <a class="logo" href="{home or '#top'}">{LOGO}<span class="logo__txt">Hollow<em>&amp;</em>Hex</span></a>
@@ -580,14 +810,14 @@ def footer_html(base, home):
   <div class="wrap ftr__in">
     <div class="ftr__brand">
       <a class="logo" href="{home or '#top'}">{LOGO}<span class="logo__txt">Hollow<em>&amp;</em>Hex</span></a>
-      <p>Light-up masks, floating candles, yard ghosts and decor, shipped free across the US and guaranteed before October 31st.</p>
+      <p>{html.escape(c("brand.footer_blurb", ""))}</p>
     </div>
-    <div class="ftr__col"><h4>Shop</h4><a href="{home}#shop">Best Sellers</a><a href="{home}#cats">LED Masks</a><a href="{home}#cats">Lights &amp; Candles</a><a href="{home}#cats">Yard &amp; Outdoor</a><a href="{home}#cats">Apparel</a></div>
+    <div class="ftr__col"><h4>Shop</h4><a href="{home}#shop">Everything</a>{"".join(f'<a href="{home}#{cat_anchor(t)}">{html.escape(t)}</a>' for t, _, _ in CATEGORIES[:5])}</div>
     <div class="ftr__col"><h4>Help</h4><a href="{home}#faq">Shipping</a><a href="{home}#faq">Returns</a><a href="{home}#faq">Track My Order</a><a href="{home}#faq">Contact</a></div>
     <div class="ftr__col"><h4>Company</h4><a href="{home}#why">About</a><a href="{home}#shop">Shop All</a><a href="{home}#faq">Privacy</a><a href="{home}#faq">Terms</a></div>
   </div>
   <div class="wrap ftr__base">
-    <p>&copy; 2026 {BRAND}. Demo storefront built for review &mdash; not a live shop.</p>
+    <p>{html.escape(c("footer_note", f"(c) 2026 {BRAND}."))}</p>
     <p class="ftr__pay"><span>VISA</span><span>MC</span><span>AMEX</span><span>PayPal</span><span>Shop&nbsp;Pay</span></p>
   </div>
 </footer>
@@ -595,7 +825,7 @@ def footer_html(base, home):
 
 
 def cart_html():
-    return """<div class="scrim" id="scrim" hidden></div>
+    return f"""<div class="scrim" id="scrim" hidden></div>
 <aside class="cart" id="cart" aria-label="Shopping cart" aria-hidden="true">
   <div class="cart__hd">
     <h2>Your Cart</h2>
@@ -604,9 +834,9 @@ def cart_html():
   <div class="cart__body" id="cartbody"></div>
   <div class="cart__ft">
     <div class="cart__row"><span>Subtotal</span><b id="carttot">$0.00</b></div>
-    <div class="cart__row cart__row--ship"><span>Shipping</span><b>FREE</b></div>
-    <button class="btn btn--gold btn--wide" type="button" id="checkout">Checkout</button>
-    <p class="cart__note">Demo storefront &mdash; checkout is not connected to a payment provider.</p>
+    <div class="cart__row cart__row--ship"><span>Shipping</span><b>{html.escape(c("buttons.cart_shipping_line", "FREE"))}</b></div>
+    <button class="btn btn--gold btn--wide" type="button" id="checkout">{html.escape(c("buttons.checkout", "Checkout"))}</button>
+    <p class="cart__note">{html.escape(c("buttons.cart_note", ""))}</p>
   </div>
 </aside>
 
@@ -629,15 +859,10 @@ def detail_for(p):
     d = dict(DETAILS.get(p["slug"], {}))
     d.setdefault("hook", p["blurb"])
     d.setdefault("bullets", catalog.BULLETS.get(p["slug"]) or sentences(p["blurb"]))
-    d.setdefault("features", [
-        ("Ships free, ships fast", "Out of a US warehouse within 24 hours of your order, tracked the whole way. No six-week wait from overseas."),
-        ("Guaranteed before Halloween", "Order by October 20th and it is on your doorstep by the 30th, or you do not pay for it."),
-        ("30 days to change your mind", "Unopened returns for a full refund. Damaged in transit, send a photo and we reship the same day."),
-    ])
-    d.setdefault("specs", [("Ships from", "United States"), ("Shipping", "Free, 2-5 business days"),
-                           ("Returns", "30 days, unopened"), ("Stock", "In stock now")])
+    d.setdefault("features", [tuple(x) for x in c("product_features", [])])
+    d.setdefault("specs", [tuple(x) for x in c("product_specs", [])])
     d.setdefault("box", [p["name"]])
-    d.setdefault("reviews", REVIEWS)
+    d.setdefault("reviews", REVIEWS_BY_SLUG.get(p["slug"], []))
     return d
 
 
@@ -685,9 +910,17 @@ def landing_page(p, others):
     # A star rating needs a review source; a price needs the client's margin
     # decision. Neither is something this script is entitled to make up.
     if p.get("rating"):
+        n = p.get("reviews")
+        # The count links to the reviews further down the page rather than
+        # just stating a number - it is the one piece of proof on this screen
+        # a sceptical shopper will want to check, so make checking one tap.
+        cnt = (f' &middot; <a href="#reviews">{n:,} review{"s" if n != 1 else ""}</a>'
+               if n else "")
+        sold = (f'<span class="pdp__sold">{p["sold"]:,}+ sold</span>'
+                if p.get("sold") else "")
         rating_html = (f'      <div class="pdp__rate">{stars(p["rating"])}'
-                       f'<span class="pdp__rc">{p["rating"]} &middot; '
-                       f'{p["reviews"]:,} reviews</span></div>\n')
+                       f'<span class="pdp__rc">{p["rating"]:.1f}{cnt}</span>'
+                       f'{sold}</div>\n')
     else:
         rating_html = ""
 
@@ -697,40 +930,70 @@ def landing_page(p, others):
     if p["price"] is None:
         buy_button = ('<button class="btn btn--gold btn--wide" type="button" disabled>'
                       'Price not set yet</button>')
+        buynow_button = ""
         stick_button = ('<button class="btn btn--gold" type="button" disabled>'
                         'Add</button>')
         stick_price = '<b class="tag-setprice">Price to be set</b>'
     else:
-        buy_button = (f'<button class="btn btn--gold btn--wide btn--add" type="button"\n'
+        # Add to Cart keeps the shopper on the page; Buy It Now takes the one
+        # item straight to checkout. Two different intents, so two buttons -
+        # and Buy It Now is the visually dominant one because a landing page
+        # built for cold ad traffic is trying to close, not to build a basket.
+        buy_button = (f'<button class="btn btn--out btn--wide btn--add" type="button"\n'
                       f'                data-add="{p["slug"]}" '
                       f'data-name="{esc(p["name"], quote=True)}" '
                       f'data-price="{p["price"]}" data-qty="qty">\n'
-                      f'          Add to Cart &mdash; {money(p["price"])}\n'
+                      f'          {esc(c("buttons.add_to_cart", "Add to Cart"))}\n'
                       f'        </button>')
+        buynow_button = (
+            f'      <button class="btn btn--gold btn--wide btn--buynow" type="button"\n'
+            f'              data-add="{p["slug"]}" '
+            f'data-name="{esc(p["name"], quote=True)}" '
+            f'data-price="{p["price"]}" data-qty="qty" data-buynow="1">\n'
+            f'        {esc(c("buttons.buy_now", "Buy It Now"))} &mdash; {money(p["price"])}\n'
+            f'      </button>\n')
         stick_button = (f'<button class="btn btn--gold btn--add" type="button"\n'
                         f'          data-add="{p["slug"]}" '
                         f'data-name="{esc(p["name"], quote=True)}" '
-                        f'data-price="{p["price"]}">\n    Add\n  </button>')
+                        f'data-price="{p["price"]}" data-buynow="1">\n    '
+                        f'{esc(c("buttons.buy_now", "Buy It Now"))}\n  </button>')
         was_s = f' <s>{money(p["was"])}</s>' if p.get("was") else ""
         stick_price = f'<b>{money(p["price"])}</b>{was_s}'
 
+    buynow_note = (f'      <p class="pdp__bnote">{esc(c("buttons.buy_now_note", ""))}</p>\n'
+                   if buynow_button and c("buttons.buy_now_note") else "")
+
     # "limited stock left at this price" cannot be shown on a product with no
     # price, and it is a claim about stock levels nobody has checked. It only
-    # renders once a price exists, and the client can switch it off entirely.
-    stock_bar = ("""      <div class="pdp__stock">
-        <div class="pdp__bar"><i style="width:22%"></i></div>
-        <p>Selling fast &mdash; limited stock left at this price</p>
+    # renders once a price exists, and the client can switch it off in one
+    # place - urgency.show_stock_bar in content.json - for all 52 pages.
+    pct = c("urgency.bar_percent", 22)
+    stock_bar = (f"""      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:{pct}%"></i></div>
+        <p>{esc(c("urgency.text", ""))}</p>
       </div>
-""" if p["price"] is not None and SHOW_STOCK_BAR else "")
+""" if p["price"] is not None and c("urgency.show_stock_bar", True)
+        and c("urgency.text") else "")
 
-    if d["reviews"]:
-        revs_html = "".join(review_card(*r) for r in d["reviews"])
+    if d["reviews"] and c("reviews_section.show", True):
+        # Best-rated first here. The full mix, complaints included, is in
+        # reviews.csv and every one of them is on the page - this only decides
+        # the order, which is a display choice, not a filter.
+        ordered = sorted(d["reviews"], key=lambda r: -r["rating"])
+        revs_html = "".join(review_card(r) for r in ordered)
+        avg = p.get("rating")
+        summary = (f'<p class="revs__sum">{stars(avg)} <b>{avg:.1f}</b> out of 5 '
+                   f'from {p["reviews"]:,} reviews</p>'
+                   if avg and p.get("reviews") else "")
         reviews_section = f"""<!-- reviews -->
 <section class="sec sec--alt" id="reviews">
   <div class="wrap">
+    <p class="sec__k">{esc(c("reviews_section.eyebrow", "Reviews"))}</p>
     <h2 class="sec__h">What buyers say</h2>
+    {summary}
     <div class="revs">
 {revs_html}    </div>
+    <p class="revs__note">{esc(c("reviews_section.note", ""))}</p>
   </div>
 </section>
 """
@@ -791,13 +1054,9 @@ def landing_page(p, others):
         </div>
         {buy_button}
       </div>
-
+{buynow_button}{buynow_note}
       <ul class="pdp__trust">
-        <li>Free US shipping, no minimum</li>
-        <li>Guaranteed delivered before Oct 31 or it's free</li>
-        <li>Ships within 24 hours from a US warehouse</li>
-        <li>30-day returns, no questions asked</li>
-      </ul>
+{"".join(f"        <li>{esc(x)}</li>" + chr(10) for x in c("product_trust_list", []))}      </ul>
     </div>
 
   </div>
@@ -839,7 +1098,7 @@ def landing_page(p, others):
     <p class="sec__k">Before you ask</p>
     <h2 class="sec__h">Questions</h2>
     <div class="faq">
-{"".join(faq_item(*f) for f in FAQ)}    </div>
+{"".join(faq_item(*f) for f in faq_items())}    </div>
   </div>
 </section>
 
@@ -888,31 +1147,258 @@ NO_PHOTO = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" rol
 """
 
 
-def build():
-    os.makedirs(ART_DIR, exist_ok=True)
-    priced = load_prices()
-    if priced:
-        print(f"prices.csv: {priced} products priced")
 
-    if REVIEWS:
-        home_reviews = """<!-- reviews -->
+
+def hero_html():
+    """Hero with the real products in it.
+
+    The old hero was type on a gradient - it looked good and told a first-time
+    visitor nothing about what was for sale. This one puts five actual product
+    photographs on the right, so the answer to "what is this shop" is visible
+    before a single word is read.
+
+    The collage slugs come from content.json. Every one is validated in build()
+    against the catalogue AND against the unavailable list, because the fastest
+    way to make a hero look broken is to front it with a product nobody can buy.
+    """
+    ticks = "".join(
+        f'<li>{html.escape(t)}</li>' for t in c("hero.ticks", []))
+    ticks = f'<ul class="hero__ticks">{ticks}</ul>' if ticks else ""
+
+    slugs = [s for s in c("hero.collage", []) if s in {x["slug"] for x in PRODUCTS}]
+    by_slug = {x["slug"]: x for x in PRODUCTS}
+    tiles = ""
+    for i, s in enumerate(slugs[:5]):
+        p = by_slug[s]
+        tiles += (f'      <a class="hcol__t hcol__t--{i + 1}" '
+                  f'href="p/{p["slug"]}/" aria-label="{html.escape(p["name"], quote=True)}">'
+                  f'<img src="{img_for(p)}" alt="{html.escape(p["name"], quote=True)}" '
+                  f'width="600" height="600" '
+                  f'{"" if i < 2 else "loading=\'lazy\'"} /></a>\n')
+    collage = f'    <div class="hcol" aria-hidden="false">\n{tiles}    </div>\n' if tiles else ""
+
+    cd = ("""    <div class="cdown" id="cdown" aria-label="Countdown to Halloween">
+      <div class="cdown__cell"><b id="cd-d">--</b><span>Days</span></div>
+      <div class="cdown__cell"><b id="cd-h">--</b><span>Hours</span></div>
+      <div class="cdown__cell"><b id="cd-m">--</b><span>Minutes</span></div>
+      <div class="cdown__cell"><b id="cd-s">--</b><span>Seconds</span></div>
+      <p class="cdown__lbl">""" + html.escape(c("countdown.label", "")) + """</p>
+    </div>
+""" if c("countdown.show", True) else "")
+
+    sec = c("hero.cta_secondary", "")
+    sec_btn = (f'<a class="btn btn--ghost" href="#cats">{html.escape(sec)}</a>'
+               if sec else "")
+    return f"""<section class="hero" id="top">
+  <div class="hero__glow" aria-hidden="true"></div>
+  <div class="wrap hero__in">
+    <div class="hero__txt">
+      <p class="hero__k">{html.escape(c("hero.eyebrow", ""))}</p>
+      <h1 class="hero__h">{html.escape(c("hero.heading_top", ""))}<br /><span>{html.escape(c("hero.heading_accent", ""))}</span></h1>
+      <p class="hero__p">{html.escape(c("hero.paragraph", ""))}</p>
+      {ticks}
+      <div class="hero__cta">
+        <a class="btn btn--gold btn--xl" href="#shop">{html.escape(c("hero.cta_primary", "Shop"))}</a>
+        {sec_btn}
+      </div>
+    </div>
+{collage}  </div>
+  <div class="wrap">
+{cd}  </div>
+</section>
+"""
+
+
+def category_sections():
+    """One section per category, in catalogue order, each with its own anchor.
+
+    This is the change the client asked for: clicking Apparel scrolls to the
+    apparel products on the same page instead of loading a separate listing.
+
+    A category with no products renders nothing rather than an empty heading -
+    which matters, because fifteen products turned out to be delisted and a
+    category could in principle empty out entirely.
+    """
+    out = []
+    for title, sub, front in CATEGORIES:
+        items = [p for p in PRODUCTS if p["cat"] == title]
+        if not items:
+            continue
+        # Priced first. The unpriced ones are still listed - they are real
+        # products - but a shopper should hit a buyable item first, and the
+        # client should see the gap gathered at the end of each row instead of
+        # scattered through it.
+        items.sort(key=lambda p: (p["price"] is None,
+                                  -(p.get("reviews") or 0)))
+        cards = "".join(product_card(p) for p in items)
+        out.append(f"""<!-- {title} -->
+<section class="sec sec--cat" id="{cat_anchor(title)}">
+  <div class="wrap">
+    <div class="cathd">
+      <div>
+        <h2 class="cathd__h">{html.escape(title)}</h2>
+        <p class="cathd__s">{html.escape(sub)}</p>
+      </div>
+      <span class="cathd__n">{len(items)} product{"s" if len(items) != 1 else ""}</span>
+    </div>
+    <div class="grid">
+{cards}    </div>
+  </div>
+</section>
+""")
+    return "".join(out)
+
+
+def home_reviews_html():
+    """The social-proof section.
+
+    Picks the best review from each of several different products rather than
+    four reviews of one - the job of this block is to say "people buy across
+    this shop and are happy", which four reviews of a single mask does not do.
+
+    Every quote is real, from a verified buyer of that product on the
+    supplier's listing. The note under the block says exactly that, because
+    they are product reviews and not reviews of this store, and pretending
+    otherwise is the thing that gets a store fined.
+    """
+    if not REVIEWS_BY_SLUG or not c("reviews_section.show", True):
+        return ""
+    by_slug = {p["slug"]: p for p in PRODUCTS}
+    picked = []
+    for slug, revs in REVIEWS_BY_SLUG.items():
+        p = by_slug.get(slug)
+        if not p or slug in catalog.UNAVAILABLE:
+            continue
+        best = max(revs, key=lambda r: (r["rating"], -abs(len(r["text"]) - 180)))
+        if best["rating"] >= 4:
+            picked.append((p, best))
+    # Longest-established proof first: most-reviewed products lead.
+    picked.sort(key=lambda x: -(x[0].get("reviews") or 0))
+    picked = picked[:6]
+    if not picked:
+        return ""
+
+    total = sum(p.get("reviews") or 0 for p in PRODUCTS if p.get("rating"))
+    rated = [p for p in PRODUCTS if p.get("rating")]
+    avg = sum(p["rating"] for p in rated) / len(rated) if rated else 0
+    head = ""
+    if total and avg:
+        head = (f'    <p class="revs__sum">{stars(avg)} <b>{avg:.1f}</b> average '
+                f'from <b>{total:,}</b> '
+                f'{html.escape(c("reviews_section.count_label", "reviews"))}</p>\n')
+
+    cards = "".join(review_card(r, product_name=p["name"]) for p, r in picked)
+    return f"""<!-- reviews -->
 <section class="sec sec--alt" id="reviews">
   <div class="wrap">
-    <h2 class="sec__h">What Buyers Say</h2>
-    <div class="revs">
-""" + "".join(review_card(*r) for r in REVIEWS) + """    </div>
+    <p class="sec__k">{html.escape(c("reviews_section.eyebrow", ""))}</p>
+    <h2 class="sec__h">{html.escape(c("reviews_section.heading", ""))}</h2>
+{head}    <div class="revs">
+{cards}    </div>
+    <p class="revs__note">{html.escape(c("reviews_section.note", ""))}</p>
   </div>
 </section>
 """
-    else:
-        home_reviews = ""
 
-    # The demo's hand-drawn SVGs went with the demo's invented products. The
-    # only artwork still needed is the placeholder for the one product whose
-    # supplier page blocks automated requests.
+
+def build():
+    global C, REVIEWS_BY_SLUG
+    os.makedirs(ART_DIR, exist_ok=True)
+    C = load_content()
+    priced = load_prices()
+    rated = load_social()
+    REVIEWS_BY_SLUG = load_reviews()
+    if priced:
+        print(f"prices.csv : {priced} products priced")
+    print(f"social.csv : {rated} products with a real supplier rating")
+    print(f"reviews.csv: {sum(len(v) for v in REVIEWS_BY_SLUG.values())} real "
+          f"reviews across {len(REVIEWS_BY_SLUG)} products")
+
+    # A hero fronted by a delisted product is the single most visible way to
+    # make the shop look broken, so it is checked rather than trusted.
+    slugs = {p["slug"] for p in PRODUCTS}
+    for s in c("hero.collage", []):
+        if s not in slugs:
+            print(f"  ! hero.collage names {s!r}, which is not a product")
+        elif s in catalog.UNAVAILABLE:
+            print(f"  ! hero.collage fronts {s!r}, which the supplier no "
+                  f"longer lists")
+    ph = c("why_us.photo")
+    if ph and ph not in slugs:
+        print(f"  ! why_us.photo names {ph!r}, which is not a product")
+
     with open(os.path.join(ART_DIR, "_no-photo.svg"), "w", encoding="utf-8") as f:
         f.write(NO_PHOTO)
     n_art = 1
+
+    trust = "".join(
+        f'    <div class="trust__i"><b>{html.escape(t)}</b>'
+        f'<span>{html.escape(s)}</span></div>\n' for t, s in trust_items())
+
+    why = ""
+    if c("why_us.show", True):
+        why_photo = [x for x in PRODUCTS
+                     if x["slug"] == c("why_us.photo")] or [PRODUCTS[0]]
+        why = f"""<!-- why -->
+<section class="sec" id="why">
+  <div class="wrap why">
+    <div class="why__txt">
+      <p class="sec__k">{html.escape(c("why_us.eyebrow", ""))}</p>
+      <h2 class="sec__h">{html.escape(c("why_us.heading_top", ""))}<br />{html.escape(c("why_us.heading_bottom", ""))}</h2>
+      <p>{html.escape(c("why_us.paragraph", ""))}</p>
+      <ul class="ticks">
+{"".join(f"        <li>{html.escape(x)}</li>" + chr(10) for x in c("why_us.ticks", []))}      </ul>
+      <a class="btn btn--gold" href="#shop">{html.escape(c("why_us.cta", "Shop"))}</a>
+    </div>
+    <div class="why__art">
+      <img src="{img_for(why_photo[0])}" alt="" aria-hidden="true" loading="lazy" width="600" height="600" />
+    </div>
+  </div>
+</section>
+"""
+
+    cap = ""
+    if c("email_capture.show", True):
+        cap = f"""<!-- email capture -->
+<section class="cap">
+  <div class="wrap cap__in">
+    <h2>{html.escape(c("email_capture.heading", ""))}</h2>
+    <p>{html.escape(c("email_capture.paragraph", ""))}</p>
+    <form class="cap__f" id="capform" novalidate>
+      <input type="email" id="capmail" placeholder="you@email.com" aria-label="Email address" required />
+      <button class="btn btn--gold" type="submit">{html.escape(c("email_capture.button", "Sign up"))}</button>
+    </form>
+    <p class="cap__msg" id="capmsg" role="status"></p>
+  </div>
+</section>
+"""
+
+    faq = ""
+    if faq_items():
+        faq = f"""<!-- faq -->
+<section class="sec" id="faq">
+  <div class="wrap wrap--narrow">
+    <p class="sec__k">Before you ask</p>
+    <h2 class="sec__h">Questions</h2>
+    <div class="faq">
+{"".join(faq_item(*f) for f in faq_items())}    </div>
+  </div>
+</section>
+"""
+
+    cats = ""
+    if c("categories_nav.show", True):
+        cats = f"""<!-- categories -->
+<section class="sec" id="cats">
+  <div class="wrap">
+    <p class="sec__k">{html.escape(c("categories_nav.eyebrow", ""))}</p>
+    <h2 class="sec__h">{html.escape(c("categories_nav.heading", ""))}</h2>
+    <p class="sec__sub">{html.escape(c("categories_nav.sub", ""))}</p>
+    <div class="cats">
+{"".join(category_card(*x) for x in CATEGORIES)}    </div>
+  </div>
+</section>
+"""
 
     page = f"""<!DOCTYPE html>
 <html lang="en">
@@ -920,7 +1406,7 @@ def build():
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{BRAND} &mdash; {TAGLINE}</title>
-<meta name="description" content="Light-up masks, floating candles, yard ghosts, decor and apparel shipped free across the US and guaranteed to land before October 31st." />
+<meta name="description" content="{html.escape(c("brand.footer_blurb", ""))}" />
 <meta name="robots" content="noindex" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -931,101 +1417,19 @@ def build():
 
 {announce_html()}
 {header_html("", "")}
-<!-- hero -->
-<section class="hero" id="top">
-  <div class="hero__glow" aria-hidden="true"></div>
-  <div class="wrap hero__in">
-    <p class="hero__k">Halloween 2026 Collection</p>
-    <h1 class="hero__h">Haunt Your House.<br /><span>Ship It Free.</span></h1>
-    <p class="hero__p">Light-up masks, floating candles, yard ghosts and decor &mdash; shipped free anywhere in the US and guaranteed on your doorstep before October 31st.</p>
-    <div class="hero__cta">
-      <a class="btn btn--gold" href="#shop">Shop the Collection</a>
-      <a class="btn btn--ghost" href="#cats">Browse Categories</a>
-    </div>
-    <div class="cdown" id="cdown" aria-label="Countdown to Halloween">
-      <div class="cdown__cell"><b id="cd-d">--</b><span>Days</span></div>
-      <div class="cdown__cell"><b id="cd-h">--</b><span>Hours</span></div>
-      <div class="cdown__cell"><b id="cd-m">--</b><span>Minutes</span></div>
-      <div class="cdown__cell"><b id="cd-s">--</b><span>Seconds</span></div>
-      <p class="cdown__lbl">until Halloween</p>
-    </div>
-  </div>
-</section>
-
+{hero_html()}
 <!-- trust -->
 <section class="trust">
   <div class="wrap trust__in">
-{"".join(f'''    <div class="trust__i"><b>{html.escape(t)}</b><span>{html.escape(s)}</span></div>
-''' for t, s in TRUST)}  </div>
+{trust}  </div>
 </section>
 
-<!-- categories -->
-<section class="sec" id="cats">
-  <div class="wrap">
-    <p class="sec__k">Shop by</p>
-    <h2 class="sec__h">Categories</h2>
-    <div class="cats">
-{"".join(category_card(*c) for c in CATEGORIES)}    </div>
-  </div>
-</section>
+{cats}{cat_chips()}
+<!-- everything, split by category, each with its own anchor -->
+<div id="shop">
+{category_sections()}</div>
 
-<!-- products -->
-<section class="sec sec--alt" id="shop">
-  <div class="wrap">
-    <p class="sec__k">Selling fast</p>
-    <h2 class="sec__h">This Season's Best Sellers</h2>
-    <p class="sec__sub">Every item ships free and is in stock right now, and guaranteed to land before October 31st.</p>
-    <div class="grid">
-{"".join(product_card(p) for p in PRODUCTS)}    </div>
-  </div>
-</section>
-
-<!-- why -->
-<section class="sec" id="why">
-  <div class="wrap why">
-    <div class="why__txt">
-      <p class="sec__k">Why us</p>
-      <h2 class="sec__h">Halloween has a deadline.<br />We're built around it.</h2>
-      <p>Most stores treat October like any other month. We don't. Every order is picked and out the door within 24 hours, tracked end to end, and backed by a written guarantee: if it isn't on your doorstep by October 30th, you don't pay for it.</p>
-      <ul class="ticks">
-        <li>US warehouse stock &mdash; not a 6-week boat from overseas</li>
-        <li>Live tracking from the moment your label is printed</li>
-        <li>Damaged in transit? Photo it, we reship the same day</li>
-        <li>Real humans on chat 7 days a week through October</li>
-      </ul>
-      <a class="btn btn--gold" href="#shop">Start Shopping</a>
-    </div>
-    <div class="why__art">
-      <img src="{img_for([x for x in PRODUCTS if x['slug'] == 'tripod-cauldron-fog'][0])}" alt="" aria-hidden="true" width="600" height="600" />
-    </div>
-  </div>
-</section>
-
-{home_reviews}
-<!-- email capture -->
-<section class="cap">
-  <div class="wrap cap__in">
-    <h2>Get 10% off your first order</h2>
-    <p>One email when the new drops land. Nothing else, and you can leave any time.</p>
-    <form class="cap__f" id="capform" novalidate>
-      <input type="email" id="capmail" placeholder="you@email.com" aria-label="Email address" required />
-      <button class="btn btn--gold" type="submit">Send My Code</button>
-    </form>
-    <p class="cap__msg" id="capmsg" role="status"></p>
-  </div>
-</section>
-
-<!-- faq -->
-<section class="sec" id="faq">
-  <div class="wrap wrap--narrow">
-    <p class="sec__k">Before you ask</p>
-    <h2 class="sec__h">Questions</h2>
-    <div class="faq">
-{"".join(faq_item(*f) for f in FAQ)}    </div>
-  </div>
-</section>
-
-{footer_html("", "")}
+{why}{home_reviews_html()}{cap}{faq}{footer_html("", "")}
 {cart_html()}
 <script src="script.js"></script>
 </body>

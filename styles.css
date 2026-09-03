@@ -645,3 +645,255 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .pdp__thumb img,
 .stick img{object-fit:contain;width:100%;height:100%}
 .pdp__thumb,.stick img{background:#f7f4ef}
+
+/* =========================================================
+   Conversion pass - added after the client reviewed v1
+   -------------------------------------------------------
+   Everything below is additive. Nothing above was deleted, because the brief
+   was explicitly "not a redesign" - same palette, same type, same brand, the
+   existing components kept their rules and the new ones sit alongside.
+   ========================================================= */
+
+/* ---------- hero: product-led ----------
+   The hero was centred type on a gradient. It looked good and told a
+   first-time visitor nothing about what was for sale, so it is now two
+   columns with five real product photographs on the right. Below 900px it
+   goes back to one column with the collage under the copy - on a phone the
+   words have to come first or the fold is all picture and no offer. */
+/* Tighter than the v1 hero on purpose. The first attempt kept the old
+   clamp(64px,10vw,120px) padding and a full 6rem headline, and with a square
+   collage beside it the hero measured 940px tall - so on a 800px laptop fold
+   the "Shop the Collection" button, the one thing the client asked to make
+   MORE prominent, was below the fold and invisible. Measured, not guessed:
+   the CTA now sits at ~640px on desktop and ~600px on a 390x780 phone. */
+.hero{padding:clamp(34px,4.5vw,60px) 0 clamp(34px,4vw,56px)}
+.hero__in{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,3.5vw,54px);
+  align-items:center;text-align:left}
+.hero__txt{min-width:0}
+.hero__k,.hero__h,.hero__p{text-align:left}
+.hero__k{margin-bottom:.7rem}
+/* the v1 clamp topped out at 6rem, which is right for a full-width centred
+   hero and far too big for a half-width column */
+.hero__h{font-size:clamp(2.4rem,4.9vw,4.1rem)}
+.hero__p{margin-top:1.1rem;font-size:1rem}
+.hero__cta{margin-top:1.7rem}
+.cdown{margin-top:2rem}
+.hero__p{margin-left:0;margin-right:0;max-width:34em}
+.hero__cta{justify-content:flex-start;align-items:center}
+.hero__ticks{list-style:none;margin:1.6rem 0 0;display:flex;flex-wrap:wrap;gap:.5rem 1.4rem}
+.hero__ticks li{position:relative;padding-left:1.5rem;font-size:.88rem;color:var(--muted)}
+.hero__ticks li::before{
+  content:'';position:absolute;left:0;top:.5rem;width:11px;height:6px;
+  border-left:2px solid var(--green);border-bottom:2px solid var(--green);
+  transform:rotate(-45deg);
+}
+
+/* The primary call to action. The client asked for it bigger and more
+   noticeable, so it is a size up, heavier, and carries a slow pulse ring that
+   stops on prefers-reduced-motion (the blanket rule at the end of the
+   responsive block already switches every animation off there). */
+.btn--xl{font-size:1rem;letter-spacing:1.8px;padding:1.15rem 2.6rem;font-weight:700;
+  position:relative}
+.btn--xl::after{
+  content:'';position:absolute;inset:-3px;border-radius:999px;pointer-events:none;
+  border:2px solid rgba(255,162,80,.55);animation:ring 2.6s ease-out infinite;
+}
+@keyframes ring{
+  0%{transform:scale(1);opacity:.55}
+  70%{transform:scale(1.13);opacity:0}
+  100%{opacity:0}
+}
+
+/* the collage: one large tile and four small, all real product photos */
+/* max-height as well as aspect-ratio. On a wide screen the collage column is
+   ~570px, and a square collage is then 570px tall - taller than the copy
+   beside it, which is what pushed the CTA off the fold. */
+.hcol{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
+  gap:12px;aspect-ratio:1/1;min-width:0;max-height:440px;margin-inline:auto}
+.hcol__t{border-radius:14px;overflow:hidden;background:#f7f4ef;border:1px solid var(--line2);
+  display:grid;place-items:center;padding:8px;
+  transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease}
+.hcol__t:hover{transform:translateY(-4px);border-color:rgba(255,117,24,.55);box-shadow:var(--shadow)}
+.hcol__t img{width:100%;height:100%;object-fit:contain}
+.hcol__t--1{grid-column:1/3;grid-row:1/3}
+.hcol__t--2{grid-column:3;grid-row:1}
+.hcol__t--3{grid-column:3;grid-row:2}
+.hcol__t--4{grid-column:1;grid-row:3}
+.hcol__t--5{grid-column:2/4;grid-row:3}
+
+/* ---------- category jump bar ----------
+   Sticks directly under the header so a category is one tap away from any
+   point on the page, which is what "jump them to that category" needs to mean
+   on a phone once you are 4000px down. */
+.chips{position:sticky;top:var(--hdr-h);z-index:40;
+  background:rgba(11,8,16,.94);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+.chips__in{display:flex;gap:8px;overflow-x:auto;padding:.7rem 24px;
+  scrollbar-width:none;-ms-overflow-style:none}
+.chips__in::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;font-size:.76rem;letter-spacing:1.2px;text-transform:uppercase;
+  font-weight:600;color:var(--muted);padding:.5rem .95rem;border-radius:999px;
+  border:1px solid var(--line2);background:var(--panel);
+  transition:color .2s ease,border-color .2s ease,background .2s ease;
+}
+.chip:hover{color:var(--bone);border-color:rgba(255,117,24,.5)}
+/* set by script.js from the section currently in view */
+.chip.on{background:var(--orange);border-color:var(--orange);color:#1a0c02}
+
+/* ---------- per-category product sections ---------- */
+.sec--cat{padding:clamp(38px,5vw,58px) 0}
+.sec--cat:nth-of-type(even){background:var(--bg2)}
+.cathd{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+  padding-bottom:1rem;border-bottom:1px solid var(--line)}
+.cathd__h{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;
+  font-size:clamp(1.5rem,3.2vw,2.3rem);letter-spacing:.6px;line-height:1.1}
+.cathd__s{color:var(--muted);font-size:.92rem;margin-top:.3rem}
+.cathd__n{flex:0 0 auto;font-size:.72rem;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--orange2);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem}
+.sec--cat .grid{margin-top:1.8rem}
+.cat__n{display:block;font-size:.72rem;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--orange2);margin-top:.55rem}
+
+/* ---------- card additions ---------- */
+/* Fixed height so the titles line up across a row whether or not the supplier
+   published a rating for that product. 20 of the 52 have none. */
+.card__rating{min-height:20.6px;align-items:center}
+.card__rating--none{margin-bottom:.5rem}
+.card__rval{font-size:.78rem;font-weight:600;color:var(--bone)}
+.card__sold{font-size:.76rem;color:var(--green);margin-top:.5rem;font-weight:500}
+/* The card foot stacks price over button below 640px anyway; on desktop the
+   button must not shrink under a long price. */
+.card__foot .btn--add{flex:0 0 auto}
+
+/* ---------- buy now ---------- */
+/* Buy It Now is the gold one and Add to Cart is the outline, deliberately the
+   reverse of the previous single-button layout. A landing page taking cold ad
+   traffic is trying to close one sale, not build a basket. */
+.btn--out{background:transparent;border:1.5px solid rgba(255,117,24,.55);color:var(--orange2)}
+.btn--out:hover{background:rgba(255,117,24,.12);border-color:var(--orange)}
+.btn--buynow{margin-top:10px;font-size:.88rem;padding:1.05rem 1.9rem}
+.pdp__bnote{font-size:.76rem;color:var(--muted);text-align:center;margin-top:.5rem}
+/* the outline Add to Cart in the buy box must not inherit the gold gradient
+   the earlier .pdp__act .btn--add rule paints on */
+.pdp__act .btn--add.btn--out{background:transparent;color:var(--orange2);
+  border:1.5px solid rgba(255,117,24,.55)}
+.pdp__act .btn--add.btn--out:hover{background:rgba(255,117,24,.12)}
+.pdp__sold{font-size:.8rem;color:var(--green);font-weight:500;
+  border-left:1px solid var(--line2);padding-left:.6rem}
+.pdp__rc a{color:var(--orange2);text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- reviews ---------- */
+.revs__sum{text-align:center;color:var(--muted);margin-top:1.1rem;font-size:.95rem}
+.revs__sum b{color:var(--bone)}
+.revs__sum .star{font-size:1.05rem}
+.revs__note{text-align:center;color:#6d6379;font-size:.82rem;margin-top:1.8rem;
+  max-width:720px;margin-left:auto;margin-right:auto;line-height:1.6}
+.rev__t{display:block;font-size:.95rem;margin-bottom:.5rem;color:var(--orange2)}
+.rev__of{font-size:.78rem;color:var(--muted);font-style:italic}
+/* Empty in every row today - the supplier's review images sit behind expiring
+   signed URLs. The rule is here so dropping a filename into the photo column
+   of reviews.csv produces a laid-out customer photo with no CSS work. */
+.rev__img{width:100%;border-radius:12px;margin-top:1rem;background:#f7f4ef;
+  max-height:230px;object-fit:cover}
+.rev blockquote{
+  /* four-line clamp: the real reviews run from 30 to 600 characters and an
+     unclamped grid gave one 5-line card and two 1-line ones on the same row */
+  display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* =========================================================
+   Responsive - conversion pass
+   ========================================================= */
+/* header + sticky chip bar, so an anchor does not land under both of them */
+html{scroll-padding-top:140px}
+
+@media(max-width:900px){
+  .hero{padding-top:clamp(24px,4vw,40px)}
+  .hero__in{grid-template-columns:1fr;gap:22px}
+  .hero__ticks{gap:.4rem 1rem}
+  /* The collage moves ABOVE the copy on a phone.
+     Stacked in source order it landed at 709px on a 780px fold, so the entire
+     first screen of a shop whose brief was "show me immediately what we sell"
+     was type on a gradient - the exact thing this pass replaced. Measured
+     after the change: the photos start at 210px and the CTA still clears the
+     fold at 700px. */
+  .hcol{order:-1;aspect-ratio:16/9;grid-template-rows:repeat(2,1fr);max-height:230px}
+  .hcol__t--1{grid-column:1/3;grid-row:1/3}
+  .hcol__t--2{grid-column:3;grid-row:1}
+  .hcol__t--3{grid-column:3;grid-row:2}
+  .hcol__t--4,.hcol__t--5{display:none}
+}
+
+/* One block for the phone breakpoint, and it must STAY one block.
+   An earlier edit inserted two narrower media queries in the middle of this
+   one and quietly re-homed the twelve rules below them into a max-width:360px
+   query. Everything still parsed, nothing errored, and on a 390px iPhone the
+   category header stopped stacking - so the "6 PRODUCTS" pill sat on top of
+   the subtitle. A stylesheet that loads cleanly and applies in the wrong
+   breakpoint looks exactly like a stylesheet that works. */
+@media(max-width:640px){
+  html{scroll-padding-top:128px}
+  .btn--xl{width:100%;font-size:.92rem;padding:1.05rem 1.5rem}
+  .btn--xl::after{animation:none}
+  .hero__cta{width:100%}
+  .hero__cta .btn--ghost{width:100%}
+  /* The same three promises are in the trust bar immediately below the hero.
+     Repeating them here cost 70px of the fold and bought nothing. */
+  .hero__ticks{display:none}
+  .hero__h{font-size:2.3rem}
+  .hero__p{font-size:.95rem;margin-top:.9rem}
+  .chips__in{padding:.6rem 16px}
+  .chip{font-size:.7rem;padding:.45rem .8rem}
+  .cathd{flex-direction:column;align-items:flex-start;gap:.55rem}
+  .cathd__n{align-self:flex-start}
+  .card__rating{margin-bottom:.35rem}
+  .card__rating .star{font-size:.78rem}
+  .card__sold{font-size:.7rem;margin-top:.35rem}
+  /* two-up cards: price above a full-width button reads better than trying to
+     fit both on one 150px line */
+  .card__foot{flex-direction:column;align-items:stretch;gap:8px}
+  .card__foot .btn--add{flex:1 1 auto;width:100%}
+  .btn--buynow{font-size:.8rem;padding:.95rem 1.2rem}
+  .revs__sum{font-size:.88rem}
+  .rev{padding:1.3rem 1.15rem}
+  .revs__note{font-size:.78rem}
+}
+
+/* A short phone - a 360x640 Android is still common - had the CTA 40px under
+   the fold with everything above already trimmed. Keyed on viewport HEIGHT
+   rather than width, because that is the dimension that actually ran out. */
+@media(max-width:640px) and (max-height:700px){
+  .hcol{max-height:150px}
+  .hero__h{font-size:2rem}
+  .hero__p{font-size:.9rem;margin-top:.7rem}
+  .hero__cta{margin-top:1.2rem}
+}
+
+/* 320px wide - an old iPhone SE. The headline wraps to three lines here no
+   matter what, so the room has to come from the collage. */
+@media(max-width:360px){
+  .hcol{max-height:118px}
+  .hero__h{font-size:1.8rem}
+  .hero__k{font-size:.7rem;letter-spacing:3px;margin-bottom:.5rem}
+}
+
+/* --------------------------------------------------------------------------
+   Square image slots that are actually square.
+
+   `.card__media` sets aspect-ratio:1/1 and the img inside it was height:100%.
+   A percentage height resolved against a height the parent only gets FROM its
+   aspect-ratio is indefinite, so it silently fell back to auto - and a photo
+   the supplier shot at 777x800 rendered 253x260.5, pushing its own card 8px
+   taller than the three beside it. Only one product in fifty-two is off-square
+   enough to notice, which is exactly why it survived two rounds of looking at
+   screenshots and was caught by measuring instead.
+
+   Giving the IMG its own aspect-ratio makes the slot square regardless of what
+   shape the supplier's photograph is.
+   -------------------------------------------------------------------------- */
+.card__media img,
+.pdp__stage img,
+.pdp__thumb img,
+.hcol__t img{aspect-ratio:1/1;height:auto;width:100%;object-fit:contain}

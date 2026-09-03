@@ -123,8 +123,14 @@
     }
 
     bodyEl.innerHTML = cart.map(function (i) {
+      /* .jpg, not .svg. The demo's hand-drawn placeholders were SVGs and this
+         line still asked for one long after every product got its real
+         supplier photograph - so every thumbnail in the cart drawer was a
+         404. Nothing in the drawer looked broken enough to notice: an <img>
+         that fails to load in a fixed-size box just renders empty. */
       return '<div class="ci" data-slug="' + i.slug + '">' +
-        '<img src="' + BASE + 'assets/products/' + i.slug + '.svg" alt="" />' +
+        '<img src="' + BASE + 'assets/products/' + i.slug + '.jpg" alt="" ' +
+        'onerror="this.src=\'' + BASE + 'assets/products/_no-photo.svg\'" />' +
         '<div class="ci__m">' +
           '<p class="ci__n">' + i.name + '</p>' +
           '<p class="ci__p">' + money(i.price * i.qty) + '</p>' +
@@ -218,6 +224,16 @@
       save();
       render();
 
+      /* Buy It Now is the same add, followed immediately by checkout. On
+         Shopify this button posts the line item straight to /checkout and
+         skips the cart entirely; here there is no payment provider, so it
+         opens the cart and says so rather than pretending to charge anyone. */
+      if (btn.hasAttribute('data-buynow')) {
+        openCart();
+        toast('Demo store - checkout is not connected yet');
+        return;
+      }
+
       var label = btn.innerHTML;
       btn.textContent = 'Added';
       btn.classList.add('done');
@@ -296,7 +312,10 @@
   /* The bar appears once the real buy button has scrolled past, and hides
      again when it comes back - two of them on screen at once is clutter. */
   var stick = $('#stick');
-  var buyBtn = $('.pdp__act .btn--add');
+  /* The lowest of the two buy buttons, not the first. Buy It Now sits UNDER
+     Add to Cart, so keying off .pdp__act alone made the sticky bar appear
+     while the real Buy It Now button was still on screen. */
+  var buyBtn = $('.btn--buynow') || $('.pdp__act .btn--add');
   function stickBar() {
     if (!stick || !buyBtn) { return; }
     var past = buyBtn.getBoundingClientRect().bottom < 0;
@@ -304,6 +323,50 @@
     stick.setAttribute('aria-hidden', String(!past));
   }
   stickBar();
+
+  /* ---------------------------------------------------------
+     Category jump bar: highlight whichever section you are in.
+
+     Scroll position, not click. Clicking a chip and marking it active is
+     easy and wrong - it goes stale the moment you scroll away, and it says
+     nothing at all if you arrive by scrolling rather than by tapping.
+     --------------------------------------------------------- */
+  /* A category chip or tile whose section is not on the page is a link to
+     nowhere. It cannot happen here today - the build emits a section for every
+     non-empty category and hides the tile otherwise - but the same rule runs on
+     the Shopify side where the jump bar and the category rows are configured
+     separately, so it is enforced in both. */
+  $$('a[href^="#"]').forEach(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    if (id && !document.getElementById(id) &&
+        (a.classList.contains('chip') || a.classList.contains('cat'))) {
+      a.hidden = true;
+    }
+  });
+
+  var chipBar = $('#chips');
+  if (chipBar) {
+    var chips = $$('.chip', chipBar).filter(function (ch) { return !ch.hidden; });
+    var sections = chips.map(function (ch) {
+      var id = (ch.getAttribute('href') || '').split('#')[1];
+      return id ? document.getElementById(id) : null;
+    });
+    var spy = function () {
+      /* the line just under the header and the chip bar - the first pixel of
+         content the reader can actually see */
+      var line = chipBar.getBoundingClientRect().bottom + 8;
+      var best = -1;
+      sections.forEach(function (sec, i) {
+        if (!sec) { return; }
+        var r = sec.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) { best = i; }
+      });
+      chips.forEach(function (ch, i) { ch.classList.toggle('on', i === best); });
+    };
+    spy();
+    window.addEventListener('scroll', spy, { passive: true });
+    window.addEventListener('resize', spy);
+  }
 
   /* ---------------------------------------------------------
      Reveal on scroll

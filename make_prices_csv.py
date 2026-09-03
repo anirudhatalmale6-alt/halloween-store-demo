@@ -76,7 +76,18 @@ def main():
             kept += 1
             your, was, by = typed, (old.get("was_price") or "").strip(), "you"
         elif src:
-            your, was, by = f"{src[0]:.2f}", "", "source"
+            # was_price is now pre-filled too, from the supplier's own listed
+            # original price. The first version left it blank and one product
+            # in fifty-two ended up with a compare-at, so the discount chip and
+            # the strike-through the client asked for were invisible on the
+            # site that was supposed to demonstrate them.
+            #
+            # It is pre-filled, not decided: set_by stays "source", so the
+            # column is his to overwrite. Worth reading the note in README
+            # first - a compare-at is a claim that the item was actually
+            # offered at that price, and it is his store making it.
+            your, by = f"{src[0]:.2f}", "source"
+            was = f"{src[1]:.2f}" if src[1] and src[1] > src[0] else ""
             prefilled += 1
             if src[0] < FLOOR:
                 thin.append((p["slug"], src[0]))

@@ -9,10 +9,13 @@ links you sent.
     p/<product>/          a landing page per product, 52 of them
     catalog.py            the products - names, descriptions, bullets, photos
     prices.csv            YOUR PRICES GO HERE
+    content.json          EVERY line of shipping/guarantee/countdown wording
+    social.csv            star rating, review count and units sold per product
+    reviews.csv           the review quotes themselves
     make_prices_csv.py    regenerates prices.csv without losing your edits
-    build.py              regenerates every page from the two files above
+    build.py              regenerates every page from the files above
     styles.css            all styling
-    script.js             cart, gallery, countdown, menu
+    script.js             cart, gallery, countdown, menu, category jump bar
 
 ---
 
@@ -24,8 +27,29 @@ links you sent.
 | Products with a verified price | **22** |
 | Products the supplier no longer lists | **15** |
 | Products that still need a price from you | **15** |
+| Products with a real star rating | **32** |
+| Real review quotes on the site | **126** |
 
 Every product has its supplier's own photographs. Nothing is a placeholder.
+
+### What changed in this round
+
+- The homepage now has **a section per category** with its own heading and
+  count. The category tiles and the sticky jump bar under the header both
+  scroll you down to them instead of loading a separate page.
+- The hero leads with **five real product photographs**, and *Shop the
+  Collection* is now the one obviously dominant button on the screen.
+- Cards show the price, the crossed-out compare-at price, the discount
+  percentage, the star rating and review count, and a full-width Add to Cart.
+- Every product page has **Buy It Now** beside Add to Cart.
+- There is a **reviews section** on the homepage and on every rated product
+  page, built from real reviews (see below), with the markup and the CSV column
+  already in place for customer photos.
+- All of the shipping, delivery, guarantee, warehouse and countdown wording
+  moved into **`content.json`** — one file, one place.
+- Fixed on the way past: the cart drawer was asking for `.svg` thumbnails long
+  after every product got a real `.jpg` photograph, so every image in the cart
+  was a silent 404.
 
 ---
 
@@ -90,6 +114,63 @@ that is not a number prints a warning and leaves the product unpriced.
 **One price needs your judgement rather than a copy.** Walmart sells the scary
 face headrest covers for $1.99. Free US shipping cannot come out of $1.99, so
 that one needs a real markup or it costs you money on every order.
+
+---
+
+## 2b. The star ratings and the reviews
+
+`social.csv` — one row per product:
+
+    handle,product,rating,reviews,sold,set_by,source
+
+`reviews.csv` — the quotes:
+
+    handle,name,rating,title,text,verified,photo
+
+**Every number and every quote in both files was read off the supplier's own
+listing for that exact product.** Nothing is invented. 32 of the 52 have a
+rating; the other 20 have empty cells and the star row simply does not appear
+on them. There is no fallback rating anywhere in the build — a 4.8 nobody
+earned is not a placeholder, it is a claim, and it would be your name on it.
+
+Reviewer names arrive already masked by the supplier (`S**r`), so no real
+name is republished.
+
+Three things to know before you use them:
+
+1. **They are reviews of the product, not of your store.** The line under the
+   reviews section says exactly that. Leave it there until your own orders
+   start producing reviews. Quoting a product review is normal; presenting it
+   as your own customer is not.
+2. **They are yours to edit.** Delete a row from `reviews.csv` and it is gone
+   on the next build. The mix includes honest four-star reviews with
+   complaints, which is deliberate — a wall of five stars reads as fake — but
+   the choice is yours.
+3. **A reviews app replaces all of this.** Judge.me or Loox on Shopify pulls
+   reviews from your real orders and takes over the same fields. Free to start.
+
+The `photo` column is empty in every row today. The supplier's review images
+sit behind expiring signed URLs and would break within days, so they were left
+out rather than shipped as future 404s. Put a filename in that column and the
+review grows a photo — the markup and the styling are already there.
+
+---
+
+## 2c. The wording you will want to change
+
+Everything about shipping, delivery, guarantees and urgency is in
+**`content.json`**. One file. Change a line, run `python3 build.py`, and it
+changes on the homepage and on all 52 product pages at once.
+
+That covers the announcement bar, the trust bar, the four promises on every
+product page, the "selling fast" line, the countdown label, the FAQ, and the
+reasons-to-buy block. Empty a line and it disappears rather than leaving a gap;
+set a `show` flag to `false` and the whole block goes.
+
+These are the claims that get a store in trouble when they go stale, which is
+why they are the ones that had to be trivial to correct. None of them is
+enforced by code — if the page promises 24-hour dispatch, that promise is
+yours to keep.
 
 ---
 
