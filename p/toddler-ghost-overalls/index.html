@@ -68,7 +68,7 @@
       <h1 class="pdp__h">Toddler Ghost &amp; Pumpkin Corduroy Overalls</h1>
       <p class="pdp__hook">Thick-wale corduroy dungarees with a ghost or a pumpkin on the bib, adjustable straps and real pockets. A costume they can actually wear.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$17.03</span></div>
 
       <ul class="pdp__bul">
         <li>Thick-wale corduroy with a ghost or a pumpkin on the bib</li>
@@ -76,6 +76,10 @@
         <li>A costume they can wear all autumn, not just once</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="toddler-ghost-overalls" data-name="Toddler Ghost &amp; Pumpkin Corduroy Overalls" data-price="17.03" data-qty="qty">
+          Add to Cart &mdash; $17.03
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -205,8 +212,8 @@
           <h3 class="card__name"><a href="../pumpkin-blanket-hoodie/">Oversized Pumpkin Blanket Hoodie</a></h3>
           <p class="card__blurb">Wearable fleece blanket covered in pumpkins and ghosts, one size over everything. The comfort buy of the season.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$30.99</span></div>
+            <button class="btn btn--add" type="button" data-add="pumpkin-blanket-hoodie" data-name="Oversized Pumpkin Blanket Hoodie" data-price="30.99">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/toddler-ghost-overalls.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>Toddler Ghost &amp; Pumpkin Corduroy Overalls</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$17.03</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="toddler-ghost-overalls" data-name="Toddler Ghost &amp; Pumpkin Corduroy Overalls" data-price="17.03">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

@@ -68,7 +68,7 @@
       <h1 class="pdp__h">Light-Up Musical Witch Broom</h1>
       <p class="pdp__hook">Motion-activated broom that lights up and plays when someone walks past. Hangs on a door or leans in a corner.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$23.88</span></div>
 
       <ul class="pdp__bul">
         <li>Motion activated - it lights up and plays as someone walks past</li>
@@ -76,6 +76,10 @@
         <li>Lights, music and motion in one piece</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="witch-broom-light-music" data-name="Light-Up Musical Witch Broom" data-price="23.88" data-qty="qty">
+          Add to Cart &mdash; $23.88
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -220,8 +227,8 @@
           <h3 class="card__name"><a href="../bat-decals-lightup/">Light-Up 3D Bat Wall Decals</a></h3>
           <p class="card__blurb">Bendable bat, spider and butterfly shapes that stick bubble-free and light up. Battery powered, 12 or 24 to a set.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$10.99</span></div>
+            <button class="btn btn--add" type="button" data-add="bat-decals-lightup" data-name="Light-Up 3D Bat Wall Decals" data-price="10.99">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/witch-broom-light-music.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>Light-Up Musical Witch Broom</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$23.88</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="witch-broom-light-music" data-name="Light-Up Musical Witch Broom" data-price="23.88">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

@@ -68,7 +68,7 @@
       <h1 class="pdp__h">Light-Up Hero Mask with Remote Ring</h1>
       <p class="pdp__hook">Moulded plastic mask with lenses that blink and glow on command. The ring on your finger does it, so nobody sees you trigger it.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$45.99</span></div>
 
       <ul class="pdp__bul">
         <li>Lenses light up red and blue, and blink on command</li>
@@ -76,6 +76,10 @@
         <li>Skin-friendly moulded plastic, 26 x 19 x 11cm</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="hero-mask-remote-ring" data-name="Light-Up Hero Mask with Remote Ring" data-price="45.99" data-qty="qty">
+          Add to Cart &mdash; $45.99
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -220,8 +227,8 @@
           <h3 class="card__name"><a href="../white-hero-mask-remote/">White Spider Hero Mask with Remote Ring</a></h3>
           <p class="card__blurb">The white and pink version, with the same remote-controlled moving lenses. Comes boxed, which makes it an easy gift.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$49.00</span></div>
+            <button class="btn btn--add" type="button" data-add="white-hero-mask-remote" data-name="White Spider Hero Mask with Remote Ring" data-price="49.0">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/hero-mask-remote-ring.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>Light-Up Hero Mask with Remote Ring</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$45.99</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="hero-mask-remote-ring" data-name="Light-Up Hero Mask with Remote Ring" data-price="45.99">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

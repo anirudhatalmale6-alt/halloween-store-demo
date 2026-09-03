@@ -68,7 +68,7 @@
       <h1 class="pdp__h">LED Trick-or-Treat Candy Totes</h1>
       <p class="pdp__hook">Reusable light-up buckets in pumpkin, ghost and skull faces. They glow, so a child stays visible after dark.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$28.04</span></div>
 
       <ul class="pdp__bul">
         <li>Reusable light-up totes - pumpkin, ghost and skull faces</li>
@@ -76,6 +76,10 @@
         <li>Non-woven and washable, 3 or 4 to a pack</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="led-candy-totes" data-name="LED Trick-or-Treat Candy Totes" data-price="28.04" data-qty="qty">
+          Add to Cart &mdash; $28.04
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -205,8 +212,8 @@
           <h3 class="card__name"><a href="../resin-skeleton-ornament/">Sitting Skeleton Resin Ornament</a></h3>
           <p class="card__blurb">A resin skeleton that sits on a shelf edge with its legs hanging. Sold singly or as a set of three.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$19.09</span></div>
+            <button class="btn btn--add" type="button" data-add="resin-skeleton-ornament" data-name="Sitting Skeleton Resin Ornament" data-price="19.09">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/led-candy-totes.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>LED Trick-or-Treat Candy Totes</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$28.04</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="led-candy-totes" data-name="LED Trick-or-Treat Candy Totes" data-price="28.04">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

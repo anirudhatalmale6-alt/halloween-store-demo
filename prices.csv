@@ -1,53 +1,53 @@
-handle,product,your_price,was_price
-hero-mask-remote-ring,Light-Up Hero Mask with Remote Ring,,
-hero-helmet-11-scale,1:1 Scale Spider Hero Helmet,,
-led-purge-mask-glow,LED Skeleton Purge Mask,,
-white-hero-mask-remote,White Spider Hero Mask with Remote Ring,,
-led-mask-gloves-set,LED Mask & Gloves Set,,
-led-mask-4-modes,"LED Halloween Mask, 4 Lighting Modes",,
-floating-candles-20pc,20-Piece Floating Candles with Magic Wand Remote,,
-floating-candles-12pc,"12-Pack Floating Candles, Enchanted Set",,
-floating-candles-kidsafe,Kid-Safe Floating LED Candles with Wand,,
-pillar-candles-remote-3,"Flameless LED Pillar Candles, Set of 3",,
-pumpkin-candle-holders-2,Pumpkin Candle Holder Set with Remote,,
-solar-fairy-lights-80ft,"80ft Solar Fairy Lights, 2 Pack",,
-halloween-tree-lights-black,"24in Black Halloween Tree Lights, 2 Pack",,
-halloween-tree-lights-24led,"24in Orange & Purple LED Tree, 2 Pack",,
-under-cabinet-rgb-bars,RGB Under-Cabinet Light Bars,,
-retro-pumpkin-desk-lamp,Retro Pumpkin & Bat Stained-Glass Desk Lamp,,
-pumpkin-night-light-mini,Mini Pumpkin Bedside Night Light,,
-ghost-campfire-nightlight,Ghost Campfire Plug-In Night Light,,
-hanging-ghosts-3pack,"Pre-Assembled Hanging Ghosts, 3 Pack",,
-ghost-swing-5ft-remote,5ft Hanging Ghost Swing with Remote Lights,,
-spider-web-kit-lights,Spider Web Kit with 32ft String Lights,,
-glow-cobwebs-spiders,Glow Stretch Cobwebs with Spiders & Bats,,
-cauldron-fog-potion,Glow Cauldron with Fog Diffuser & Potion Bottles,,
-tripod-cauldron-fog,Large Tripod Cauldron with Fog Maker,,
-laser-swamp-projector,Waterproof Laser Swamp Light Projector,,
-witch-broom-light-music,Light-Up Musical Witch Broom,,
-bat-wall-stickers-160,160-Piece 3D Bat Wall Stickers,,
-led-bats-purple-36,36-Piece Purple LED 3D Bats,,
-bat-decals-lightup,Light-Up 3D Bat Wall Decals,,
-garage-door-bat-magnets,Glow Bat Garage Door Magnet Set,,
-witch-bat-magnet-set,Witch & Bat Car and Fridge Magnet Set,,
-advent-calendar-31-nights,31 Nights of Fright Advent Calendar,,
-bathroom-set-vintage,Vintage Halloween Bathroom Set,,
-skeleton-vortex-rug,Skeleton Vortex Illusion Round Rug,,
-boo-kitchen-rug-set,"BOO! Kitchen Runner Rug Set, 2 Piece",,
-ghost-candy-bowl-glow,Glow Ghost Candy Bowl with Lights,,
-led-candy-totes,LED Trick-or-Treat Candy Totes,,
-skeleton-pumpkin-figures-3,"Skeleton Pumpkin Table Figures, Set of 3",,
-resin-skeleton-ornament,Sitting Skeleton Resin Ornament,,
-dragon-book-corner-light,3D Dragon Book Corner Light,,
-splatmat-bloody-bath-mat,SplatMat - Colour-Changing Bloody Bath Mat,21.99,34.99
-skeleton-cardigan-black,Black Skeleton Print Cardigan,,
-skeleton-cardigan-colours,Skeleton Print Knit Cardigan,,
-skull-drop-shoulder-sweater,Distressed Skull Drop-Shoulder Sweater,,
-toddler-ghost-overalls,Toddler Ghost & Pumpkin Corduroy Overalls,,
-toddler-spooky-goose-sweater,Toddler 'Spooky Goose' Knit Sweater,,
-pumpkin-blanket-hoodie,Oversized Pumpkin Blanket Hoodie,,
-pumpkin-skull-slippers,Pumpkin & Skull Plush Slippers,,
-ghostface-phone-case,Dripping Ghostface Phone Case,,
-trick-or-treat-phone-case,Trick-or-Treat Glitter Phone Case with Strap,,
-pumpkin-dog-collar,Pumpkin & Sunflower Dog Collar,,
-scary-face-headrest-covers,"Scary Face Car Headrest Covers, 2 Pack",,
+handle,product,your_price,was_price,set_by,source_price,source_was,source
+hero-mask-remote-ring,Light-Up Hero Mask with Remote Ring,45.99,,source,45.99,,tiktok
+hero-helmet-11-scale,1:1 Scale Spider Hero Helmet,,,,,,
+led-purge-mask-glow,LED Skeleton Purge Mask,,,,,,
+white-hero-mask-remote,White Spider Hero Mask with Remote Ring,49.00,,source,49.00,,tiktok
+led-mask-gloves-set,LED Mask & Gloves Set,,,,,,
+led-mask-4-modes,"LED Halloween Mask, 4 Lighting Modes",,,,,,
+floating-candles-20pc,20-Piece Floating Candles with Magic Wand Remote,,,,,,
+floating-candles-12pc,"12-Pack Floating Candles, Enchanted Set",,,,,,
+floating-candles-kidsafe,Kid-Safe Floating LED Candles with Wand,,,,,,
+pillar-candles-remote-3,"Flameless LED Pillar Candles, Set of 3",23.14,,source,23.14,39.90,tiktok
+pumpkin-candle-holders-2,Pumpkin Candle Holder Set with Remote,,,,,,
+solar-fairy-lights-80ft,"80ft Solar Fairy Lights, 2 Pack",,,,,,
+halloween-tree-lights-black,"24in Black Halloween Tree Lights, 2 Pack",,,,,,
+halloween-tree-lights-24led,"24in Orange & Purple LED Tree, 2 Pack",,,,,,
+under-cabinet-rgb-bars,RGB Under-Cabinet Light Bars,,,,,,
+retro-pumpkin-desk-lamp,Retro Pumpkin & Bat Stained-Glass Desk Lamp,,,,,,
+pumpkin-night-light-mini,Mini Pumpkin Bedside Night Light,,,,,,
+ghost-campfire-nightlight,Ghost Campfire Plug-In Night Light,12.99,,source,12.99,25.99,tiktok
+hanging-ghosts-3pack,"Pre-Assembled Hanging Ghosts, 3 Pack",23.99,,source,23.99,,tiktok
+ghost-swing-5ft-remote,5ft Hanging Ghost Swing with Remote Lights,35.99,,source,35.99,85.99,tiktok
+spider-web-kit-lights,Spider Web Kit with 32ft String Lights,,,,,,
+glow-cobwebs-spiders,Glow Stretch Cobwebs with Spiders & Bats,,,,,,
+cauldron-fog-potion,Glow Cauldron with Fog Diffuser & Potion Bottles,,,,,,
+tripod-cauldron-fog,Large Tripod Cauldron with Fog Maker,31.99,,source,31.99,71.99,tiktok
+laser-swamp-projector,Waterproof Laser Swamp Light Projector,,,,,,
+witch-broom-light-music,Light-Up Musical Witch Broom,23.88,,source,23.88,49.99,tiktok
+bat-wall-stickers-160,160-Piece 3D Bat Wall Stickers,,,,,,
+led-bats-purple-36,36-Piece Purple LED 3D Bats,,,,,,
+bat-decals-lightup,Light-Up 3D Bat Wall Decals,10.99,,source,10.99,15.99,tiktok
+garage-door-bat-magnets,Glow Bat Garage Door Magnet Set,,,,,,
+witch-bat-magnet-set,Witch & Bat Car and Fridge Magnet Set,12.86,,source,12.86,23.39,tiktok
+advent-calendar-31-nights,31 Nights of Fright Advent Calendar,19.49,,source,19.49,39.00,tiktok
+bathroom-set-vintage,Vintage Halloween Bathroom Set,,,,,,
+skeleton-vortex-rug,Skeleton Vortex Illusion Round Rug,,,,,,
+boo-kitchen-rug-set,"BOO! Kitchen Runner Rug Set, 2 Piece",16.84,,source,16.84,,tiktok
+ghost-candy-bowl-glow,Glow Ghost Candy Bowl with Lights,19.99,,source,19.99,49.99,tiktok
+led-candy-totes,LED Trick-or-Treat Candy Totes,28.04,,source,28.04,50.99,tiktok
+skeleton-pumpkin-figures-3,"Skeleton Pumpkin Table Figures, Set of 3",,,,,,
+resin-skeleton-ornament,Sitting Skeleton Resin Ornament,19.09,,source,19.09,,tiktok
+dragon-book-corner-light,3D Dragon Book Corner Light,,,,,,
+splatmat-bloody-bath-mat,SplatMat - Colour-Changing Bloody Bath Mat,21.99,,source,21.99,34.99,splatmatofficial.com
+skeleton-cardigan-black,Black Skeleton Print Cardigan,,,,,,
+skeleton-cardigan-colours,Skeleton Print Knit Cardigan,25.99,,source,25.99,39.98,tiktok
+skull-drop-shoulder-sweater,Distressed Skull Drop-Shoulder Sweater,24.27,,source,24.27,47.59,tiktok
+toddler-ghost-overalls,Toddler Ghost & Pumpkin Corduroy Overalls,17.03,,source,17.03,,tiktok
+toddler-spooky-goose-sweater,Toddler 'Spooky Goose' Knit Sweater,,,,,,
+pumpkin-blanket-hoodie,Oversized Pumpkin Blanket Hoodie,30.99,,source,30.99,49.99,tiktok
+pumpkin-skull-slippers,Pumpkin & Skull Plush Slippers,,,,,,
+ghostface-phone-case,Dripping Ghostface Phone Case,,,,,,
+trick-or-treat-phone-case,Trick-or-Treat Glitter Phone Case with Strap,16.87,,source,16.87,33.75,tiktok
+pumpkin-dog-collar,Pumpkin & Sunflower Dog Collar,,,,,,
+scary-face-headrest-covers,"Scary Face Car Headrest Covers, 2 Pack",1.99,,source,1.99,2.99,walmart

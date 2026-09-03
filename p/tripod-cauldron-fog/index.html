@@ -68,7 +68,7 @@
       <h1 class="pdp__h">Large Tripod Cauldron with Fog Maker</h1>
       <p class="pdp__hook">The big one, on a tripod, with a skeleton climbing out and a fog maker included. Built to sit on a patio or a porch step.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$31.99</span></div>
 
       <ul class="pdp__bul">
         <li>The large one, standing on its own tripod</li>
@@ -76,6 +76,10 @@
         <li>Built for a patio, porch step or driveway</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="tripod-cauldron-fog" data-name="Large Tripod Cauldron with Fog Maker" data-price="31.99" data-qty="qty">
+          Add to Cart &mdash; $31.99
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -205,8 +212,8 @@
           <h3 class="card__name"><a href="../witch-broom-light-music/">Light-Up Musical Witch Broom</a></h3>
           <p class="card__blurb">Motion-activated broom that lights up and plays when someone walks past. Hangs on a door or leans in a corner.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$23.88</span></div>
+            <button class="btn btn--add" type="button" data-add="witch-broom-light-music" data-name="Light-Up Musical Witch Broom" data-price="23.88">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/tripod-cauldron-fog.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>Large Tripod Cauldron with Fog Maker</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$31.99</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="tripod-cauldron-fog" data-name="Large Tripod Cauldron with Fog Maker" data-price="31.99">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

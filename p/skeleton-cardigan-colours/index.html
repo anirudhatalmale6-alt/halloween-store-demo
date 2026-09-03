@@ -68,7 +68,7 @@
       <h1 class="pdp__h">Skeleton Print Knit Cardigan</h1>
       <p class="pdp__hook">The same ribcage knit in green, pink, cream and black. Long line, drop shoulder, worn open.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$25.99</span></div>
 
       <ul class="pdp__bul">
         <li>The same ribcage knit in green, pink, cream and black</li>
@@ -76,6 +76,10 @@
         <li>Unisex sizing</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="skeleton-cardigan-colours" data-name="Skeleton Print Knit Cardigan" data-price="25.99" data-qty="qty">
+          Add to Cart &mdash; $25.99
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -190,8 +197,8 @@
           <h3 class="card__name"><a href="../skull-drop-shoulder-sweater/">Distressed Skull Drop-Shoulder Sweater</a></h3>
           <p class="card__blurb">Heavy black knit with a worn skull graphic and deliberate distressing. Streetwear first, Halloween second, so it sells past October.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$24.27</span></div>
+            <button class="btn btn--add" type="button" data-add="skull-drop-shoulder-sweater" data-name="Distressed Skull Drop-Shoulder Sweater" data-price="24.27">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -205,8 +212,8 @@
           <h3 class="card__name"><a href="../toddler-ghost-overalls/">Toddler Ghost &amp; Pumpkin Corduroy Overalls</a></h3>
           <p class="card__blurb">Thick-wale corduroy dungarees with a ghost or a pumpkin on the bib, adjustable straps and real pockets. A costume they can actually wear.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$17.03</span></div>
+            <button class="btn btn--add" type="button" data-add="toddler-ghost-overalls" data-name="Toddler Ghost &amp; Pumpkin Corduroy Overalls" data-price="17.03">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/skeleton-cardigan-colours.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>Skeleton Print Knit Cardigan</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$25.99</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="skeleton-cardigan-colours" data-name="Skeleton Print Knit Cardigan" data-price="25.99">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

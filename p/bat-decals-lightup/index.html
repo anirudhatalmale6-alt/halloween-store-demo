@@ -68,7 +68,7 @@
       <h1 class="pdp__h">Light-Up 3D Bat Wall Decals</h1>
       <p class="pdp__hook">Bendable bat, spider and butterfly shapes that stick bubble-free and light up. Battery powered, 12 or 24 to a set.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$10.99</span></div>
 
       <ul class="pdp__bul">
         <li>Bendable bat, spider and butterfly shapes</li>
@@ -76,6 +76,10 @@
         <li>Battery powered, 12 or 24 to a set</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="bat-decals-lightup" data-name="Light-Up 3D Bat Wall Decals" data-price="10.99" data-qty="qty">
+          Add to Cart &mdash; $10.99
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -205,8 +212,8 @@
           <h3 class="card__name"><a href="../witch-bat-magnet-set/">Witch &amp; Bat Car and Fridge Magnet Set</a></h3>
           <p class="card__blurb">Witches, cats, pumpkins and bats for a car door, a fridge or a garage. Glows in the dark. Made for trunk-or-treat.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$12.86</span></div>
+            <button class="btn btn--add" type="button" data-add="witch-bat-magnet-set" data-name="Witch &amp; Bat Car and Fridge Magnet Set" data-price="12.86">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -220,8 +227,8 @@
           <h3 class="card__name"><a href="../advent-calendar-31-nights/">31 Nights of Fright Advent Calendar</a></h3>
           <p class="card__blurb">A blind bag for every night of October - collectible mini figures, hanging charms and small decorations. Sells itself to anyone with kids.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$19.49</span></div>
+            <button class="btn btn--add" type="button" data-add="advent-calendar-31-nights" data-name="31 Nights of Fright Advent Calendar" data-price="19.49">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/bat-decals-lightup.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>Light-Up 3D Bat Wall Decals</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$10.99</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="bat-decals-lightup" data-name="Light-Up 3D Bat Wall Decals" data-price="10.99">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

@@ -68,7 +68,7 @@
       <h1 class="pdp__h">5ft Hanging Ghost Swing with Remote Lights</h1>
       <p class="pdp__hook">Five feet of ghost with built-in string lights on a remote. Big enough to read from the street, which is the whole point.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$35.99</span></div>
 
       <ul class="pdp__bul">
         <li>Five feet of ghost - big enough to see from the road</li>
@@ -76,6 +76,10 @@
         <li>For a tree, porch, yard or garden</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="ghost-swing-5ft-remote" data-name="5ft Hanging Ghost Swing with Remote Lights" data-price="35.99" data-qty="qty">
+          Add to Cart &mdash; $35.99
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -279,9 +286,12 @@
   <img src="../../assets/products/ghost-swing-5ft-remote.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>5ft Hanging Ghost Swing with Remote Lights</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$35.99</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="ghost-swing-5ft-remote" data-name="5ft Hanging Ghost Swing with Remote Lights" data-price="35.99">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

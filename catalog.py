@@ -46,12 +46,16 @@ CATEGORIES = [
      "floating-candles-20pc"),
     ("Yard & Outdoor", "Ghosts, cobwebs, cauldrons and projectors",
      "hanging-ghosts-3pack"),
+    # Home & Decor and Accessories used to be fronted by the bat wall stickers
+    # and the Ghostface phone case. Both turned out to be products the supplier
+    # has stopped listing, and a category tile is the last place to advertise
+    # something nobody can buy. Repointed to items that are in stock and priced.
     ("Home & Decor", "Bats, rugs, bathroom sets and skeleton ornaments",
-     "bat-wall-stickers-160"),
+     "boo-kitchen-rug-set"),
     ("Apparel", "Sweaters, cardigans, overalls and slippers",
      "skeleton-cardigan-black"),
     ("Accessories", "Phone cases, magnets, pet collars and car decor",
-     "ghostface-phone-case"),
+     "trick-or-treat-phone-case"),
 ]
 
 
@@ -447,15 +451,113 @@ PRODUCTS = [
       "Scary Face Car Headrest Covers, 2 Pack",
       "Accessories",
       "Slip-on headrest covers with a printed scary face, sold as a pair. "
-      "Roughly 9.84 inches, fits most cars, trucks and SUVs.",
-      [],
+      "The face is 25cm / 9.84 inches, and the elastic hem stretches over the "
+      "headrests in most cars, trucks and SUVs.",
+      # Walmart's own four usable photos, in the order they are shown: fitted
+      # in a dark car, the gag shot with the driver, the plain white-background
+      # product shot, then the dimensioned diagram. Walmart's fifth image is a
+      # marketing collage with headline text baked into it, so it is left out.
+      ["2-Pack-Car-Headrest-Cover-Scary-Face",
+       "111a815d-0764-471f-98bf-7f9d22db9dbb",
+       "f7880027-0315-4d63-bd5a-66d580235d67",
+       "a5c24527-924e-4201-8c1a-2294e06d06ac"],
       source="https://www.walmart.com/ip/2-Pack-Car-Headrest-Cover-Scary-Face-"
              "Printing-Car-Seat-Headrest-Cover-9-84in-2026-Funny-Face-Masque-"
              "Head-Rest-Protector-for-Auto-Vehicle-Truck/20212966534",
-      note="Walmart blocks automated requests to this page, so there is no "
-           "photo and no price. The name comes from the link itself. This is "
-           "the only one of the 52 with no image."),
+      note="Walmart refuses an ordinary browser request but answers a crawler, "
+           "so this now has its four real photos and a verified source price."),
 ]
+
+# What the SOURCE charges a shopper today. Not the client's cost, and not his
+# selling price - a reference point, recorded so nobody has to take a number on
+# trust. Every figure here was read off the seller's own page.
+#
+# For TikTok the figure is NOT from that product's own page. A TikTok product
+# page masks its own price ("3*" instead of "31.99") and its JSON-LD repeats the
+# masked value truncated to a bare integer, so a page priced at $31.99 reports
+# "price": 3. Reading that as three dollars would have understated ten products
+# by a factor of ten. The unmasked figure comes from the recommendation widgets
+# on OTHER products' pages, parsed out of __MODERN_ROUTER_DATA__ as JSON so each
+# price stays attached to the product it belongs to.
+#
+#   slug -> (price, was_price or None, where it was read)
+# Every TikTok figure below was checked against an independent oracle before it
+# was allowed in. Two families of source disagreed - prices read off the
+# recommendation widgets of other products' pages, and prices read off the
+# seller's own store page - and they disagreed on fifteen products, sometimes
+# by a factor of three. The tie-break is the mask itself: a product page hides
+# its price as "3*", which is useless for pricing and decisive for refuting, so
+# a $54.99 claim against a "3*" mask is simply thrown out. That killed fifteen
+# wrong figures, including one case where the widgets agreed with each other
+# and were still wrong ($9.11 against a "1*" mask; the real price is $19.09).
+# Six more products had two candidates that both fit the mask and are left
+# unpriced rather than guessed.
+SOURCE_PRICES = {
+    "white-hero-mask-remote":      (49.00, None,  "tiktok"),
+    "hero-mask-remote-ring":       (45.99, None,  "tiktok"),
+    "ghost-swing-5ft-remote":      (35.99, 85.99, "tiktok"),
+    "tripod-cauldron-fog":         (31.99, 71.99, "tiktok"),
+    "pumpkin-blanket-hoodie":      (30.99, 49.99, "tiktok"),
+    "led-candy-totes":             (28.04, 50.99, "tiktok"),
+    "skeleton-cardigan-colours":   (25.99, 39.98, "tiktok"),
+    "skull-drop-shoulder-sweater": (24.27, 47.59, "tiktok"),
+    "hanging-ghosts-3pack":        (23.99, None,  "tiktok"),
+    "witch-broom-light-music":     (23.88, 49.99, "tiktok"),
+    "pillar-candles-remote-3":     (23.14, 39.90, "tiktok"),
+    "ghost-candy-bowl-glow":       (19.99, 49.99, "tiktok"),
+    "advent-calendar-31-nights":   (19.49, 39.00, "tiktok"),
+    "resin-skeleton-ornament":     (19.09, None,  "tiktok"),
+    "toddler-ghost-overalls":      (17.03, None,  "tiktok"),
+    "trick-or-treat-phone-case":   (16.87, 33.75, "tiktok"),
+    "boo-kitchen-rug-set":         (16.84, None,  "tiktok"),
+    "ghost-campfire-nightlight":   (12.99, 25.99, "tiktok"),
+    "witch-bat-magnet-set":        (12.86, 23.39, "tiktok"),
+    "bat-decals-lightup":          (10.99, 15.99, "tiktok"),
+    "scary-face-headrest-covers":  (1.99,   2.99, "walmart"),
+    # 21.99/34.99, re-read from splatmatofficial.com/products/splatmat.js.
+    # This entry first went in as 49.99/79.99, which was not from anywhere -
+    # it was a number I remembered rather than one I fetched. The build caught
+    # it only because the figure disagreed with the price already in the
+    # product below, and a was_price under the sale price is a hard error here.
+    # A remembered number is not a source.
+    "splatmat-bloody-bath-mat":    (21.99, 34.99, "splatmatofficial.com"),
+}
+
+# Products whose TikTok page no longer loads AND which appear nowhere else.
+#
+# Not a guess from one failed request. Each of these returns {"code":100000} to
+# every URL form - bare id and slug alike - in three separate runs hours apart,
+# while other products served normally from the same browser seconds later. On
+# top of that, none of them appears even once across 99 fetched pages: not in a
+# single recommendation widget, not in their own seller's store listing, not in
+# a category page.
+#
+# The sixteenth product that refuses its own page, white-hero-mask-remote, is
+# NOT here: its seller lists it three times at $49.00, so it exists and only
+# its product page is broken. That is the difference this list is careful to
+# preserve.
+#
+# They are deliberately left on the site. All fifteen are unpriced, so the buy
+# button is already switched off on every one of them - nothing can be ordered
+# that cannot be fulfilled - and dropping a client's products because a scrape
+# came back empty is his call to make, not mine.
+UNAVAILABLE = {
+    "floating-candles-kidsafe",
+    "pumpkin-skull-slippers",
+    "skeleton-pumpkin-figures-3",
+    "pumpkin-night-light-mini",
+    "bat-wall-stickers-160",
+    "led-mask-4-modes",
+    "pumpkin-dog-collar",
+    "floating-candles-12pc",
+    "halloween-tree-lights-black",
+    "ghostface-phone-case",
+    "garage-door-bat-magnets",
+    "glow-cobwebs-spiders",
+    "spider-web-kit-lights",
+    "toddler-spooky-goose-sweater",
+    "led-mask-gloves-set",
+}
 
 
 def check():
@@ -470,6 +572,21 @@ def check():
         assert x["cat"] in cats, f"{x['slug']} has unknown category {x['cat']}"
     fronts = {c[2] for c in CATEGORIES}
     assert fronts <= seen, f"category tile points at a missing product: {fronts - seen}"
+
+    # A typo in either table would silently do nothing - a price that never
+    # reaches a product, or an unavailable flag on a slug that does not exist.
+    stray = set(SOURCE_PRICES) - seen
+    assert not stray, f"SOURCE_PRICES names products that do not exist: {stray}"
+    stray = UNAVAILABLE - seen
+    assert not stray, f"UNAVAILABLE names products that do not exist: {stray}"
+
+    # Two category tiles are fronted by products the supplier has stopped
+    # listing. The photo is saved locally so the tile still renders, but the
+    # client should know he is advertising a section with a dead item on it.
+    for name, _, front in CATEGORIES:
+        if front in UNAVAILABLE:
+            print(f"  ! category '{name}' is fronted by {front}, "
+                  f"which the supplier no longer lists")
     return len(PRODUCTS)
 
 

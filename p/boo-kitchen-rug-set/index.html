@@ -68,7 +68,7 @@
       <h1 class="pdp__h">BOO! Kitchen Runner Rug Set, 2 Piece</h1>
       <p class="pdp__hook">Two non-slip runners for a kitchen, hallway or laundry. Washable, and they sit flat rather than curling at the corners.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$16.84</span></div>
 
       <ul class="pdp__bul">
         <li>Two non-slip runners - kitchen, hallway or laundry</li>
@@ -76,6 +76,10 @@
         <li>They lie flat rather than curling at the corners</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="boo-kitchen-rug-set" data-name="BOO! Kitchen Runner Rug Set, 2 Piece" data-price="16.84" data-qty="qty">
+          Add to Cart &mdash; $16.84
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -190,8 +197,8 @@
           <h3 class="card__name"><a href="../ghost-candy-bowl-glow/">Glow Ghost Candy Bowl with Lights</a></h3>
           <p class="card__blurb">A draped ghost with a bowl in its middle and a lit interior on a timer and remote. Works on a porch step for trick-or-treaters.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$19.99</span></div>
+            <button class="btn btn--add" type="button" data-add="ghost-candy-bowl-glow" data-name="Glow Ghost Candy Bowl with Lights" data-price="19.99">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -205,8 +212,8 @@
           <h3 class="card__name"><a href="../led-candy-totes/">LED Trick-or-Treat Candy Totes</a></h3>
           <p class="card__blurb">Reusable light-up buckets in pumpkin, ghost and skull faces. They glow, so a child stays visible after dark.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$28.04</span></div>
+            <button class="btn btn--add" type="button" data-add="led-candy-totes" data-name="LED Trick-or-Treat Candy Totes" data-price="28.04">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/boo-kitchen-rug-set.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>BOO! Kitchen Runner Rug Set, 2 Piece</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$16.84</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="boo-kitchen-rug-set" data-name="BOO! Kitchen Runner Rug Set, 2 Piece" data-price="16.84">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

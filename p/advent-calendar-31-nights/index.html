@@ -68,7 +68,7 @@
       <h1 class="pdp__h">31 Nights of Fright Advent Calendar</h1>
       <p class="pdp__hook">A blind bag for every night of October - collectible mini figures, hanging charms and small decorations. Sells itself to anyone with kids.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$19.49</span></div>
 
       <ul class="pdp__bul">
         <li>A blind bag for every night of October, 31 in total</li>
@@ -76,6 +76,10 @@
         <li>Sells itself to anyone with children</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="advent-calendar-31-nights" data-name="31 Nights of Fright Advent Calendar" data-price="19.49" data-qty="qty">
+          Add to Cart &mdash; $19.49
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -220,8 +227,8 @@
           <h3 class="card__name"><a href="../boo-kitchen-rug-set/">BOO! Kitchen Runner Rug Set, 2 Piece</a></h3>
           <p class="card__blurb">Two non-slip runners for a kitchen, hallway or laundry. Washable, and they sit flat rather than curling at the corners.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$16.84</span></div>
+            <button class="btn btn--add" type="button" data-add="boo-kitchen-rug-set" data-name="BOO! Kitchen Runner Rug Set, 2 Piece" data-price="16.84">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/advent-calendar-31-nights.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>31 Nights of Fright Advent Calendar</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$19.49</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="advent-calendar-31-nights" data-name="31 Nights of Fright Advent Calendar" data-price="19.49">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>

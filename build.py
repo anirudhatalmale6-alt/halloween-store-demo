@@ -429,9 +429,9 @@ def money(v):
 def img_for(p, i=0, base=""):
     """Path to a product photo. Falls back to the drawn placeholder.
 
-    Exactly one product has no photograph - Walmart blocks automated requests
-    to its page. It gets the placeholder rather than a broken image, and the
-    placeholder says so in words, so nobody ships it by accident.
+    Every one of the 52 has a real photograph now. The placeholder is kept
+    because it is the right answer for a product added later with no image
+    yet - it says so in words, so nobody ships it by accident.
     """
     if not p["images"]:
         return f"{base}assets/products/_no-photo.svg"

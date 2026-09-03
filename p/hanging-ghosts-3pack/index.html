@@ -68,7 +68,7 @@
       <h1 class="pdp__h">Pre-Assembled Hanging Ghosts, 3 Pack</h1>
       <p class="pdp__hook">Three full-size ghosts that come out of the box ready to hang. No assembly, no frame to build - straight onto a tree or a porch.</p>
 
-      <div class="pdp__price noprice"><span class="tag-setprice">Price to be set</span></div>
+      <div class="pdp__price"><span class="price">$23.99</span></div>
 
       <ul class="pdp__bul">
         <li>Three full-size ghosts, pre-assembled out of the box</li>
@@ -76,6 +76,10 @@
         <li>Larger than the usual pack, so they read from the street</li>
       </ul>
 
+      <div class="pdp__stock">
+        <div class="pdp__bar"><i style="width:22%"></i></div>
+        <p>Selling fast &mdash; limited stock left at this price</p>
+      </div>
 
       <div class="pdp__act">
         <div class="qty" id="qty">
@@ -83,7 +87,10 @@
           <b id="qtyn">1</b>
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
-        <button class="btn btn--gold btn--wide" type="button" disabled>Price not set yet</button>
+        <button class="btn btn--gold btn--wide btn--add" type="button"
+                data-add="hanging-ghosts-3pack" data-name="Pre-Assembled Hanging Ghosts, 3 Pack" data-price="23.99" data-qty="qty">
+          Add to Cart &mdash; $23.99
+        </button>
       </div>
 
       <ul class="pdp__trust">
@@ -190,8 +197,8 @@
           <h3 class="card__name"><a href="../ghost-swing-5ft-remote/">5ft Hanging Ghost Swing with Remote Lights</a></h3>
           <p class="card__blurb">Five feet of ghost with built-in string lights on a remote. Big enough to read from the street, which is the whole point.</p>
           <div class="card__foot">
-            <div class="card__price noprice"><span class="tag-setprice">Price to be set</span></div>
-            <button class="btn btn--add" type="button" disabled title="Set a price for this product first">Add to Cart</button>
+            <div class="card__price"><span class="price">$35.99</span></div>
+            <button class="btn btn--add" type="button" data-add="ghost-swing-5ft-remote" data-name="5ft Hanging Ghost Swing with Remote Lights" data-price="35.99">Add to Cart</button>
           </div>
         </div>
       </article>
@@ -279,9 +286,12 @@
   <img src="../../assets/products/hanging-ghosts-3pack.jpg" alt="" width="600" height="600" />
   <div class="stick__m">
     <p>Pre-Assembled Hanging Ghosts, 3 Pack</p>
-    <span><b class="tag-setprice">Price to be set</b></span>
+    <span><b>$23.99</b></span>
   </div>
-  <button class="btn btn--gold" type="button" disabled>Add</button>
+  <button class="btn btn--gold btn--add" type="button"
+          data-add="hanging-ghosts-3pack" data-name="Pre-Assembled Hanging Ghosts, 3 Pack" data-price="23.99">
+    Add
+  </button>
 </div>
 
 <script src="../../script.js"></script>
