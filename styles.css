@@ -378,6 +378,12 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   padding:10px 16px calc(10px + env(safe-area-inset-bottom));
   background:rgba(15,10,22,.97);border-top:1px solid var(--line);
   transform:translateY(100%);transition:transform .28s ease;
+  /* A ceiling, because this bar is fixed to the bottom of a phone and anything
+     that makes it tall covers the page instead of just looking wrong. Content
+     is a 44px thumb plus 10px/10px padding; the cap leaves headroom for a
+     two-line label and still cannot eat the screen if a future rule oversizes
+     a child. Failing clipped beats failing 45% of the viewport tall. */
+  max-height:calc(72px + env(safe-area-inset-bottom));overflow:hidden;
 }
 .stick.on{transform:translateY(0)}
 .stick img{width:44px;height:44px;object-fit:contain;flex:0 0 auto;
@@ -602,7 +608,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   .stick{padding-left:12px;padding-right:12px}
   /* the sticky bar sits over the footer at the bottom of the page - give the
      landing pages room underneath so nothing is permanently covered */
-  .pdp-page{padding-bottom:74px}
+  .pdp-page{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -683,8 +689,17 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
    is squashed into it - measured at 506x900 natural rendering as 163x163.
    `contain` keeps the whole product visible, which matters on a thumbnail
    whose only job is to identify which view it is. */
-.pdp__thumb img,
-.stick img{object-fit:contain;width:100%;height:100%}
+.pdp__thumb img{object-fit:contain;width:100%;height:100%}
+
+/* .stick img is deliberately NOT in the rule above, and this is the whole
+   reason for the comment. It used to be, and `width:100%;height:100%` beat the
+   `44px` square set on it 300 lines earlier - same specificity, later wins - so
+   the thumbnail in the fixed buy bar rendered at 366x366 and the bar grew to
+   387px tall: 45% of a phone screen, permanently parked over the bottom of
+   every priced product page, hiding its own price and Buy button.
+   The two elements only ever shared `object-fit:contain`, and .stick img
+   already has that. A thumbnail whose parent is a fixed square wants 100%; one
+   that IS the fixed square must not be given it. */
 .pdp__thumb,.stick img{background:#f7f4ef}
 
 /* =========================================================
