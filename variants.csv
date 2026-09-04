@@ -1,0 +1,24 @@
+handle,option1_name,option1_values,option1_images,option2_name,option2_values,evidence
+# Every row here is a variant list I could PROVE from the supplier's own
+# material, and the evidence column names the photo that proved it. Nothing in
+# this file was invented. A size or a colour your supplier does not stock is a
+# refund and a bad review, not an extra sale.
+#
+# Values are separated by a pipe |. Add or remove one and re-run
+# make_products_csv.py - no code is edited to change a variant list.
+#
+# option1_images is optional and aligns position by position with
+# option1_values. Where it is filled in, picking that option swaps the main
+# photo on the product page. Leave a slot empty to leave the photo alone.
+#
+# The products NOT in this file are not an oversight. Either the supplier's own
+# graphic shows a single version - the Skeleton Vortex Rug prints "SIZE 80x80cm
+# / PACKAGE 1 PC", the Pumpkin Blanket Hoodie's size chart has exactly one row
+# and it reads "One size" - or there was no evidence either way and adding
+# options would have been me guessing with your money.
+skeleton-cardigan-black,Size,S|M|L|XL|XXL,,,,"photo 4 is the supplier's own SIZE CHART: S/M/L/XL/XXL with shoulder, chest, length and sleeve in cm, plus a height and weight recommendation per size"
+skeleton-cardigan-colours,Size,S|M|L|XL|XXL,,Color,Black|Grey|Pink|Army Green|Khaki,"photo 7 is the same SIZE CHART (S-XXL). Photos 1 and 2 carry a MORE COLORS strip of five swatches, and photo 1 shows four of them made up - army green, grey, pink and black - with the khaki/taupe swatch the fifth"
+skull-drop-shoulder-sweater,Color,Ivory|Black|Charcoal|Orange|Pink,skull-drop-shoulder-sweater-8.jpg|skull-drop-shoulder-sweater-7.jpg|skull-drop-shoulder-sweater-3.jpg|skull-drop-shoulder-sweater-4.jpg|skull-drop-shoulder-sweater-5.jpg,,,"photos 2-5 print 5 COLORS above a five-swatch strip and each of these five is photographed as a finished garment, which is where the per-colour photos come from. Photo 6 is a NAVY one that is not on the strip, so it is left out until the supplier confirms it. NO size chart appears in any of its eight photos - hence the needs-size tag"
+ghost-campfire-nightlight,Style,Style 1 - Ghosts by the Fire|Style 6 - Witch and Cauldron|Style 9 - Ghosts Toasting Marshmallows,,,,"photo 2 is a 3x3 grid captioned 9 Styles Available. Only these three are Halloween. Styles 2,3,4,5,7 and 8 are Christmas - snowmen, the Grinch, reindeer, gnomes, Santa and Mrs Claus - and they are deliberately not sold under a product called Ghost Campfire Night Light"
+toddler-ghost-overalls,Design,Ghost (White)|Pumpkin (Orange),toddler-ghost-overalls-6.jpg|toddler-ghost-overalls-5.jpg,,,"both colourways are photographed on children and photo 7 lays the two side by side. NO size chart in any of the eight photos - hence the needs-size tag"
+trick-or-treat-phone-case,Phone Model,iPhone 16|iPhone 16 Plus|iPhone 16 Pro|iPhone 16 Pro Max|iPhone 16e,,,,"photo 2 is the supplier's own shopping guide and it screenshots their live model picker: iPhone 16, 16 Plus, 16 Pro, 16 Pro Max, 16e. The picker then reads 'See more' and the same graphic gives Samsung instructions, so their real list is LONGER than this. These five are the ones I can actually read"
