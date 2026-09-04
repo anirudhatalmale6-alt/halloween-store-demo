@@ -96,6 +96,13 @@
     if (!Array.isArray(cart)) { cart = []; }
   } catch (e) { cart = []; }
 
+  /* A cart line is identified by `key`, not by `slug`: the same jumper in two
+     colours is two lines, and before variants existed the second one merged
+     into the first and silently changed its colour. Carts saved by the older
+     build have no key at all, so give them one rather than dropping the whole
+     cart of anybody who was mid-shop when this went out. */
+  cart.forEach(function (i) { if (!i.key) { i.key = i.slug; } });
+
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(cart)); } catch (e) { /* private mode */ }
   }
@@ -128,11 +135,15 @@
          supplier photograph - so every thumbnail in the cart drawer was a
          404. Nothing in the drawer looked broken enough to notice: an <img>
          that fails to load in a fixed-size box just renders empty. */
-      return '<div class="ci" data-slug="' + i.slug + '">' +
+      /* The photo is still keyed on slug - all five colours share a gallery -
+         while the LINE is keyed on i.key. */
+      var opt = i.opts && i.opts.length
+        ? '<p class="ci__v">' + i.opts.join(' / ') + '</p>' : '';
+      return '<div class="ci" data-key="' + i.key + '">' +
         '<img src="' + BASE + 'assets/products/' + i.slug + '.jpg" alt="" ' +
         'onerror="this.src=\'' + BASE + 'assets/products/_no-photo.svg\'" />' +
         '<div class="ci__m">' +
-          '<p class="ci__n">' + i.name + '</p>' +
+          '<p class="ci__n">' + i.name + '</p>' + opt +
           '<p class="ci__p">' + money(i.price * i.qty) + '</p>' +
           '<div class="ci__q">' +
             '<button type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>' +
@@ -179,16 +190,16 @@
   on(bodyEl, 'click', function (e) {
     var row = e.target.closest('.ci');
     if (!row) { return; }
-    var slug = row.getAttribute('data-slug');
-    var item = cart.filter(function (i) { return i.slug === slug; })[0];
+    var key = row.getAttribute('data-key');
+    var item = cart.filter(function (i) { return i.key === key; })[0];
     if (!item) { return; }
 
     if (e.target.hasAttribute('data-remove')) {
-      cart = cart.filter(function (i) { return i.slug !== slug; });
+      cart = cart.filter(function (i) { return i.key !== key; });
     } else if (e.target.hasAttribute('data-step')) {
       item.qty += parseInt(e.target.getAttribute('data-step'), 10);
       if (item.qty < 1) {
-        cart = cart.filter(function (i) { return i.slug !== slug; });
+        cart = cart.filter(function (i) { return i.key !== key; });
       }
     } else {
       return;
@@ -210,12 +221,22 @@
         if (read > 0) { add = read; }
       }
 
-      var found = cart.filter(function (i) { return i.slug === slug; })[0];
+      /* data-opts names the picker on THIS page. Reading it at click time
+         rather than caching it means the value that goes in the cart is
+         whatever the radios say at the moment of the click - there is no
+         second copy of the selection that could disagree with the screen. */
+      var opts = btn.getAttribute('data-opts')
+        ? readOpts(btn.getAttribute('data-opts')) : null;
+      var key = opts ? slug + '::' + opts.join('/') : slug;
+
+      var found = cart.filter(function (i) { return i.key === key; })[0];
       if (found) {
         found.qty += add;
       } else {
         cart.push({
+          key: key,
           slug: slug,
+          opts: opts,
           name: btn.getAttribute('data-name'),
           price: parseFloat(btn.getAttribute('data-price')),
           qty: add
@@ -242,7 +263,9 @@
         btn.classList.remove('done');
       }, 1100);
 
-      toast(btn.getAttribute('data-name') + (add > 1 ? ' x' + add : '') + ' added to cart');
+      toast(btn.getAttribute('data-name')
+        + (opts ? ' (' + opts.join(' / ') + ')' : '')
+        + (add > 1 ? ' x' + add : '') + ' added to cart');
     });
   });
 
@@ -296,6 +319,49 @@
       pdpImg.src = t.getAttribute('data-view');
       $$('.pdp__thumb').forEach(function (o) { o.classList.remove('on'); });
       t.classList.add('on');
+    });
+  });
+
+  /* ---------------------------------------------------------
+     Size / colour picker.
+
+     Reads the checked radio out of each .opt row. It does NOT keep its own
+     copy of the selection: the radios ARE the state, so a value can never be
+     shown in the label while a different one is what gets added to the cart.
+     --------------------------------------------------------- */
+  function readOpts(id) {
+    var box = document.getElementById(id);
+    if (!box) { return null; }
+    var picked = $$('.opt', box).map(function (row) {
+      var input = $('input:checked', row);
+      return input ? input.value : null;
+    });
+    return picked.indexOf(null) === -1 ? picked : null;
+  }
+
+  $$('.pdp__opts .opt').forEach(function (row) {
+    row.addEventListener('change', function (e) {
+      var input = e.target;
+      if (!input || input.type !== 'radio') { return; }
+
+      $$('.pill', row).forEach(function (p) { p.classList.remove('on'); });
+      var pill = input.closest('.pill');
+      if (pill) { pill.classList.add('on'); }
+
+      var label = $('[data-sel]', row);
+      if (label) { label.textContent = input.value; }
+
+      /* Only some values carry a photo of their own - five colours of a jumper
+         do, five phone models do not. A value with no photo LEAVES the gallery
+         where it is rather than snapping back to frame one, because resetting
+         it would undo a thumbnail the shopper deliberately clicked. */
+      var view = input.getAttribute('data-view');
+      if (view && pdpImg) {
+        pdpImg.src = view;
+        $$('.pdp__thumb').forEach(function (t) {
+          t.classList.toggle('on', t.getAttribute('data-view') === view);
+        });
+      }
     });
   });
 

@@ -317,6 +317,28 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .pdp__bar i{display:block;height:100%;border-radius:999px;
   background:linear-gradient(90deg,var(--orange),var(--orange2))}
 .pdp__stock p{font-size:.78rem;color:var(--orange2);margin-top:.5rem;letter-spacing:.4px}
+/* Size / colour picker. Deliberately identical to the Shopify theme's rules
+   so the demo and the live store are the same control, not two that resemble
+   each other. If one is restyled the other has to be restyled with it. */
+.pdp__opts{margin-top:1.6rem;display:grid;gap:1.1rem}
+.opt__label{
+  display:block;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);
+}
+.opt__label b{color:var(--bone);font-weight:600}
+.opt__vals{display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem}
+.pill{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);border-radius:999px;background:var(--panel);
+  padding:.55rem 1.05rem;font-size:.86rem;cursor:pointer;
+  transition:border-color .18s ease,background .18s ease,color .18s ease;
+}
+.pill:hover{border-color:var(--orange2)}
+/* the radio stays in the DOM for keyboard users - display:none would take it
+   out of the tab order and make the picker unusable without a mouse */
+.pill input{position:absolute;opacity:0;width:100%;height:100%;left:0;top:0;margin:0;cursor:pointer}
+.pill.on{background:rgba(255,117,24,.16);border-color:var(--orange);color:var(--orange2);font-weight:600}
+.pill input:focus-visible + span{outline:2px solid var(--orange2);outline-offset:4px;border-radius:4px}
+
 .pdp__act{display:flex;gap:12px;margin-top:1.5rem;align-items:stretch}
 .qty{
   display:flex;align-items:center;gap:.2rem;flex:0 0 auto;
@@ -511,6 +533,9 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .ci img{width:62px;height:62px;object-fit:contain;background:#120d1b;border-radius:10px;padding:5px;flex-shrink:0}
 .ci__m{flex:1;min-width:0}
 .ci__n{font-size:.88rem;font-weight:500;line-height:1.35}
+/* The chosen size/colour, under the name. Without it two lines of the same
+   jumper are indistinguishable in the drawer. */
+.ci__v{font-size:.76rem;color:var(--orange2);letter-spacing:.4px;margin-top:.15rem}
 .ci__p{font-size:.85rem;color:var(--orange2);margin-top:.2rem;font-weight:600}
 .ci__q{display:flex;align-items:center;gap:8px;margin-top:.5rem}
 .ci__q button{width:24px;height:24px;border:1px solid var(--line2);border-radius:6px;

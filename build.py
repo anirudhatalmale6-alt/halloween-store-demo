@@ -99,6 +99,117 @@ def load_prices():
     return n
 
 
+def load_variants():
+    """Read variants.csv - the SAME file the Shopify importer reads.
+
+    One file, two consumers. If the demo kept its own copy of the option lists
+    they would drift, and the drift would be invisible: the demo would go on
+    showing five colours after the sixth was added to the store, and nobody
+    would be looking at both pages at once to notice.
+
+    Returns {slug: {"options": [(name, [values]), ...], "images": {(name, value): file}}}.
+    """
+    path = os.path.join(HERE, "variants.csv")
+    if not os.path.exists(path):
+        return {}
+    with open(path, newline="", encoding="utf-8") as f:
+        # csv.DictReader has no notion of a comment. Without this filter the
+        # header block at the top of the file comes back as a row whose handle
+        # is "# Every row here is..." and that handle matches no product, so
+        # the failure would be a silent one.
+        lines = [ln for ln in f if not ln.lstrip().startswith("#")]
+
+    known = {p["slug"] for p in catalog.PRODUCTS}
+    out = {}
+    for r in csv.DictReader(lines):
+        handle = (r.get("handle") or "").strip()
+        if not handle:
+            continue
+        if handle not in known:
+            # Loud, not silent. A renamed product would otherwise quietly lose
+            # its options on both the demo and the store at the same time.
+            print(f"  ! variants.csv names a product that does not exist: {handle}")
+            continue
+        opts, imgs = [], {}
+        for n in ("1", "2", "3"):
+            name = (r.get(f"option{n}_name") or "").strip()
+            vals = [v.strip() for v in (r.get(f"option{n}_values") or "").split("|") if v.strip()]
+            if not name or not vals:
+                continue
+            opts.append((name, vals))
+            # Position-aligned with the values, and a short list is allowed, so
+            # zip() would drop the tail rather than complain about it.
+            files = [v.strip() for v in (r.get(f"option{n}_images") or "").split("|")]
+            for i, v in enumerate(vals):
+                if i < len(files) and files[i]:
+                    imgs[(name, v)] = files[i]
+        if opts:
+            out[handle] = {"options": opts, "images": imgs}
+    return out
+
+
+VARIANTS = {}
+
+
+def variant_block(p, base=""):
+    """The size/colour picker, or "" for a product with nothing to pick.
+
+    Rendered from variants.csv, so it never invents an option. The default
+    selection is the first value of each list, which is also what the Shopify
+    theme selects, so the demo and the store open on the same variant.
+    """
+    v = VARIANTS.get(p["slug"])
+    if not v:
+        return ""
+    esc = html.escape
+    # variants.csv names a photo by FILENAME; img_for() resolves an index, and
+    # it is the only thing that knows about the bare-id fallback. So map the
+    # filename back to its index and go through img_for rather than gluing a
+    # path together here and getting a different answer for the same photo.
+    by_file = {str(f): i for i, f in enumerate(p["images"])}
+    rows = []
+    for idx, (name, values) in enumerate(v["options"]):
+        pills = []
+        for i, val in enumerate(values):
+            f = v["images"].get((name, val), "")
+            # The photo is looked up in THIS product's own gallery. A filename
+            # that is not in it is a typo in the spreadsheet, and swapping to a
+            # 404 would leave a broken image where a jumper used to be.
+            # NOT `idx` - that is the option row's index, and reusing the name
+            # here silently made every data-idx and every radio group name read
+            # "None". Two option rows sharing one radio group is one control,
+            # so choosing a colour cleared the size.
+            photo_i = by_file.get(f)
+            if f and photo_i is None:
+                print(f"  ! {p['slug']}: variants.csv points {name}/{val} at "
+                      f"{f}, which is not one of its photos - photo swap off")
+            view = (f' data-view="{img_for(p, photo_i, base)}"'
+                    if photo_i is not None else "")
+            pills.append(
+                f'<label class="pill{" on" if i == 0 else ""}">'
+                f'<input type="radio" name="{p["slug"]}-opt{idx}" '
+                f'value="{esc(val, quote=True)}"{" checked" if i == 0 else ""}{view}>'
+                f'<span>{esc(val)}</span></label>')
+        rows.append(f"""        <div class="opt" data-idx="{idx}">
+          <span class="opt__label">{esc(name)}: <b data-sel>{esc(values[0])}</b></span>
+          <div class="opt__vals">{"".join(pills)}</div>
+        </div>
+""")
+    out = '      <div class="pdp__opts" id="opts">\n' + "".join(rows) + "      </div>\n"
+    # Two option rows must never share a radio group name, or they are one
+    # control and picking a colour clears the size. They must also each have a
+    # numeric data-idx, because the script reads the rows by that. Both of
+    # these were broken at once by a one-word variable clash and neither is
+    # visible on the page - the pills still look and click exactly right.
+    groups = re.findall(r'name="([^"]+)"', out)
+    assert len(set(groups)) == len(v["options"]), \
+        f'{p["slug"]}: {len(set(groups))} radio groups for {len(v["options"])} options'
+    idxs = re.findall(r'data-idx="([^"]*)"', out)
+    assert idxs == [str(i) for i in range(len(v["options"]))], \
+        f'{p["slug"]}: option rows are indexed {idxs}'
+    return out
+
+
 def load_content():
     """Read content.json - every editable line of copy on the site.
 
@@ -716,6 +827,11 @@ def product_card(p, base="", href=None):
                if is_dead(p) else "Set a price for this product first")
         add = (f'<button class="btn btn--add" type="button" disabled '
                f'title="{tip}">Add to Cart</button>')
+    elif p["slug"] in VARIANTS:
+        # A card cannot pick a size. Adding blind is how somebody who wanted
+        # XXL in khaki receives an S in black, so a product with real options
+        # sends the shopper to its page instead. Same rule as the Shopify card.
+        add = f'<a class="btn btn--add" href="{href}">Choose options</a>'
     else:
         add = (f'<button class="btn btn--add" type="button" data-add="{p["slug"]}" '
                f'data-name="{html.escape(p["name"], quote=True)}" data-price="{p["price"]}">'
@@ -1089,23 +1205,30 @@ def landing_page(p, others):
         # item straight to checkout. Two different intents, so two buttons -
         # and Buy It Now is the visually dominant one because a landing page
         # built for cold ad traffic is trying to close, not to build a basket.
+        #
+        # data-opts names the picker these buttons must read before they add
+        # anything. It is spelled out rather than left for the script to find,
+        # because the related-products strip further down this same page is
+        # full of buttons that also carry data-add and must NOT inherit this
+        # product's chosen colour.
+        vopts = ' data-opts="opts"' if p["slug"] in VARIANTS else ""
         buy_button = (f'<button class="btn btn--out btn--wide btn--add" type="button"\n'
                       f'                data-add="{p["slug"]}" '
                       f'data-name="{esc(p["name"], quote=True)}" '
-                      f'data-price="{p["price"]}" data-qty="qty">\n'
+                      f'data-price="{p["price"]}" data-qty="qty"{vopts}>\n'
                       f'          {esc(c("buttons.add_to_cart", "Add to Cart"))}\n'
                       f'        </button>')
         buynow_button = (
             f'      <button class="btn btn--gold btn--wide btn--buynow" type="button"\n'
             f'              data-add="{p["slug"]}" '
             f'data-name="{esc(p["name"], quote=True)}" '
-            f'data-price="{p["price"]}" data-qty="qty" data-buynow="1">\n'
+            f'data-price="{p["price"]}" data-qty="qty" data-buynow="1"{vopts}>\n'
             f'        {esc(c("buttons.buy_now", "Buy It Now"))} &mdash; {money(p["price"])}\n'
             f'      </button>\n')
         stick_button = (f'<button class="btn btn--gold btn--add" type="button"\n'
                         f'          data-add="{p["slug"]}" '
                         f'data-name="{esc(p["name"], quote=True)}" '
-                        f'data-price="{p["price"]}" data-buynow="1">\n    '
+                        f'data-price="{p["price"]}" data-buynow="1"{vopts}>\n    '
                         f'{esc(c("buttons.buy_now", "Buy It Now"))}\n  </button>')
         was_s = f' <s>{money(p["was"])}</s>' if p.get("was") else ""
         stick_price = f'<b>{money(p["price"])}</b>{was_s}'
@@ -1200,7 +1323,7 @@ def landing_page(p, others):
 {bullets}      </ul>
 
 {stock_bar}
-      <div class="pdp__act">
+{variant_block(p, base)}      <div class="pdp__act">
         {qty_html}{buy_button}
       </div>
 {buynow_button}{buynow_note}
@@ -1451,14 +1574,22 @@ def home_reviews_html():
 
 
 def build():
-    global C, REVIEWS_BY_SLUG
+    global C, REVIEWS_BY_SLUG, VARIANTS
     os.makedirs(ART_DIR, exist_ok=True)
     C = load_content()
     priced = load_prices()
     rated = load_social()
     REVIEWS_BY_SLUG = load_reviews()
+    VARIANTS = load_variants()
     if priced:
         print(f"prices.csv : {priced} products priced")
+    if VARIANTS:
+        n = sum(len(vals) for v in VARIANTS.values() for _n, vals in v["options"])
+        print(f"variants.csv: {len(VARIANTS)} products with options, "
+              f"{n} values across {sum(len(v['options']) for v in VARIANTS.values())} option lists")
+        for slug, v in sorted(VARIANTS.items()):
+            shape = " x ".join(f"{len(vals)} {nm}" for nm, vals in v["options"])
+            print(f"    {slug:32} {shape}")
     print(f"social.csv : {rated} products with a real supplier rating")
     print(f"reviews.csv: {sum(len(v) for v in REVIEWS_BY_SLUG.values())} real "
           f"reviews across {len(REVIEWS_BY_SLUG)} products")

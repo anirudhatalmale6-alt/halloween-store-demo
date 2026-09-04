@@ -106,6 +106,16 @@
         <p>Selling fast - limited stock left at this price</p>
       </div>
 
+      <div class="pdp__opts" id="opts">
+        <div class="opt" data-idx="0">
+          <span class="opt__label">Size: <b data-sel>S</b></span>
+          <div class="opt__vals"><label class="pill on"><input type="radio" name="skeleton-cardigan-colours-opt0" value="S" checked><span>S</span></label><label class="pill"><input type="radio" name="skeleton-cardigan-colours-opt0" value="M"><span>M</span></label><label class="pill"><input type="radio" name="skeleton-cardigan-colours-opt0" value="L"><span>L</span></label><label class="pill"><input type="radio" name="skeleton-cardigan-colours-opt0" value="XL"><span>XL</span></label><label class="pill"><input type="radio" name="skeleton-cardigan-colours-opt0" value="XXL"><span>XXL</span></label></div>
+        </div>
+        <div class="opt" data-idx="1">
+          <span class="opt__label">Color: <b data-sel>Black</b></span>
+          <div class="opt__vals"><label class="pill on"><input type="radio" name="skeleton-cardigan-colours-opt1" value="Black" checked><span>Black</span></label><label class="pill"><input type="radio" name="skeleton-cardigan-colours-opt1" value="Grey"><span>Grey</span></label><label class="pill"><input type="radio" name="skeleton-cardigan-colours-opt1" value="Pink"><span>Pink</span></label><label class="pill"><input type="radio" name="skeleton-cardigan-colours-opt1" value="Army Green"><span>Army Green</span></label><label class="pill"><input type="radio" name="skeleton-cardigan-colours-opt1" value="Khaki"><span>Khaki</span></label></div>
+        </div>
+      </div>
       <div class="pdp__act">
         <div class="qty" id="qty">
           <button type="button" data-q="-1" aria-label="Decrease quantity">&minus;</button>
@@ -113,12 +123,12 @@
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
         <button class="btn btn--out btn--wide btn--add" type="button"
-                data-add="skeleton-cardigan-colours" data-name="Skeleton Print Knit Cardigan" data-price="25.99" data-qty="qty">
+                data-add="skeleton-cardigan-colours" data-name="Skeleton Print Knit Cardigan" data-price="25.99" data-qty="qty" data-opts="opts">
           Add to Cart
         </button>
       </div>
       <button class="btn btn--gold btn--wide btn--buynow" type="button"
-              data-add="skeleton-cardigan-colours" data-name="Skeleton Print Knit Cardigan" data-price="25.99" data-qty="qty" data-buynow="1">
+              data-add="skeleton-cardigan-colours" data-name="Skeleton Print Knit Cardigan" data-price="25.99" data-qty="qty" data-buynow="1" data-opts="opts">
         Buy It Now &mdash; $25.99
       </button>
       <p class="pdp__bnote">Straight to checkout - skips the cart</p>
@@ -262,7 +272,7 @@
           <p class="card__sold">19,503+ sold</p>
           <div class="card__foot">
             <div class="card__price"><span class="price">$24.27</span><span class="was">$47.59</span></div>
-            <button class="btn btn--add" type="button" data-add="skull-drop-shoulder-sweater" data-name="Distressed Skull Drop-Shoulder Sweater" data-price="24.27">Add to Cart</button>
+            <a class="btn btn--add" href="../skull-drop-shoulder-sweater/">Choose options</a>
           </div>
         </div>
       </article>
@@ -279,7 +289,7 @@
           
           <div class="card__foot">
             <div class="card__price"><span class="price">$17.03</span></div>
-            <button class="btn btn--add" type="button" data-add="toddler-ghost-overalls" data-name="Toddler Ghost &amp; Pumpkin Corduroy Overalls" data-price="17.03">Add to Cart</button>
+            <a class="btn btn--add" href="../toddler-ghost-overalls/">Choose options</a>
           </div>
         </div>
       </article>
@@ -357,7 +367,7 @@
     <span><b>$25.99</b> <s>$39.98</s></span>
   </div>
   <button class="btn btn--gold btn--add" type="button"
-          data-add="skeleton-cardigan-colours" data-name="Skeleton Print Knit Cardigan" data-price="25.99" data-buynow="1">
+          data-add="skeleton-cardigan-colours" data-name="Skeleton Print Knit Cardigan" data-price="25.99" data-buynow="1" data-opts="opts">
     Buy It Now
   </button>
 </div>

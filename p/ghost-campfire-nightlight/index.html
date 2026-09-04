@@ -109,6 +109,12 @@
         <p>Selling fast - limited stock left at this price</p>
       </div>
 
+      <div class="pdp__opts" id="opts">
+        <div class="opt" data-idx="0">
+          <span class="opt__label">Style: <b data-sel>Style 1 - Ghosts by the Fire</b></span>
+          <div class="opt__vals"><label class="pill on"><input type="radio" name="ghost-campfire-nightlight-opt0" value="Style 1 - Ghosts by the Fire" checked><span>Style 1 - Ghosts by the Fire</span></label><label class="pill"><input type="radio" name="ghost-campfire-nightlight-opt0" value="Style 6 - Witch and Cauldron"><span>Style 6 - Witch and Cauldron</span></label><label class="pill"><input type="radio" name="ghost-campfire-nightlight-opt0" value="Style 9 - Ghosts Toasting Marshmallows"><span>Style 9 - Ghosts Toasting Marshmallows</span></label></div>
+        </div>
+      </div>
       <div class="pdp__act">
         <div class="qty" id="qty">
           <button type="button" data-q="-1" aria-label="Decrease quantity">&minus;</button>
@@ -116,12 +122,12 @@
           <button type="button" data-q="1" aria-label="Increase quantity">+</button>
         </div>
         <button class="btn btn--out btn--wide btn--add" type="button"
-                data-add="ghost-campfire-nightlight" data-name="Ghost Campfire Plug-In Night Light" data-price="12.99" data-qty="qty">
+                data-add="ghost-campfire-nightlight" data-name="Ghost Campfire Plug-In Night Light" data-price="12.99" data-qty="qty" data-opts="opts">
           Add to Cart
         </button>
       </div>
       <button class="btn btn--gold btn--wide btn--buynow" type="button"
-              data-add="ghost-campfire-nightlight" data-name="Ghost Campfire Plug-In Night Light" data-price="12.99" data-qty="qty" data-buynow="1">
+              data-add="ghost-campfire-nightlight" data-name="Ghost Campfire Plug-In Night Light" data-price="12.99" data-qty="qty" data-buynow="1" data-opts="opts">
         Buy It Now &mdash; $12.99
       </button>
       <p class="pdp__bnote">Straight to checkout - skips the cart</p>
@@ -346,7 +352,7 @@
     <span><b>$12.99</b> <s>$25.99</s></span>
   </div>
   <button class="btn btn--gold btn--add" type="button"
-          data-add="ghost-campfire-nightlight" data-name="Ghost Campfire Plug-In Night Light" data-price="12.99" data-buynow="1">
+          data-add="ghost-campfire-nightlight" data-name="Ghost Campfire Plug-In Night Light" data-price="12.99" data-buynow="1" data-opts="opts">
     Buy It Now
   </button>
 </div>
